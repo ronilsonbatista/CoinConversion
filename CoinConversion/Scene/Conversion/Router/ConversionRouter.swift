@@ -26,8 +26,8 @@ class ConversionRouter {
     
     func createConversionScreen() {
         let viewController = ConversionViewController(
-            viewModel: ConversionViewModel(
-                service: CurrenciesConversionService(),
+            presenter: ConversionPresenter(
+                interactor: CurrenciesConversionInteractor(),
                 dataManager: DataManager(),
                 router: self
         ))

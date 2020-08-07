@@ -88,12 +88,12 @@ class ConversionViewController: UIViewController {
     
     @IBOutlet private weak var resultLabel: UILabel!
     
-    var viewModel: ConversionViewModel?
+    var presenter: ConversionPresenter?
     
     private var currentString = ""
     
-    init(viewModel: ConversionViewModel) {
-        self.viewModel = viewModel
+    init(presenter: ConversionPresenter) {
+        self.presenter = presenter
         super.init(nibName: ConversionViewController.nibName, bundle: nil)
     }
     
@@ -112,8 +112,8 @@ extension ConversionViewController {
         setupBarButton()
         addDoneButtonOnKeyboard()
         
-        viewModel?.delegate = self
-        viewModel?.fetchQuotes(isRefresh: false)
+        presenter?.delegate = self
+        presenter?.fetchQuotes(isRefresh: false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -164,11 +164,11 @@ extension ConversionViewController {
     }
     
     @objc private dynamic func refreshButtonTouched() {
-        viewModel?.fetchQuotes(isRefresh: true)
+        presenter?.fetchQuotes(isRefresh: true)
     }
     
     private func doLoading(action: UIAlertAction) {
-        viewModel?.fetchQuotes(isRefresh: true)
+        presenter?.fetchQuotes(isRefresh: true)
     }
     
     private func toViewTapGestureRecognizer(_ view: UIView) {
@@ -182,11 +182,11 @@ extension ConversionViewController {
     }
     
     @objc private dynamic func tapGestureRecognizedToView(sender: UITapGestureRecognizer) {
-        viewModel?.fetchCurrencies(.to)
+        presenter?.fetchCurrencies(.to)
     }
     
     @objc private dynamic func tapGestureRecognizedFromView(sender: UITapGestureRecognizer) {
-        viewModel?.fetchCurrencies(.from)
+        presenter?.fetchCurrencies(.from)
     }
     
     @objc private func keyboardWillShow(notification:NSNotification){
@@ -261,7 +261,7 @@ extension ConversionViewController: UITextFieldDelegate {
                 }
             }
         }
-        viewModel?.fetchConvert(fromCode: fromCode, toCode: toCode, value: currentString)
+        presenter?.fetchConvert(fromCode: fromCode, toCode: toCode, value: currentString)
         return false
     }
 }
@@ -270,12 +270,12 @@ extension ConversionViewController: UITextFieldDelegate {
 // MARK: - Format Currency
 extension ConversionViewController {
     private func formatCurrency(_ string: String, textField: UITextField, currencyCode: String) {
-        textField.text = viewModel?.formatCurrency(currencyCode: currencyCode, amount: string)!
+        textField.text = presenter?.formatCurrency(currencyCode: currencyCode, amount: string)!
     }
 }
 
-// MARK: - ConversionViewModelDelegate
-extension ConversionViewController: ConversionViewModelDelegate {
+// MARK: - ConversionPresenterDelegate
+extension ConversionViewController: ConversionPresenterDelegate {
     func didStartLoading() {
         showActivityIndicator()
     }

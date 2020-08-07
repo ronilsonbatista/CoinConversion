@@ -8,19 +8,19 @@
 
 import Foundation
 
-// MARK: - ConversionModel
-class ConversionModel: NSObject {
+// MARK: - ConversionViewModel
+class ConversionViewModel: NSObject {
     var date: Double?
-    var conversion: [ConversionCurrenciesModel]?
+    var conversion: [ConversionCurrenciesViewModel]?
     
-    init(date: Double, conversion: [ConversionCurrenciesModel]) {
+    init(date: Double, conversion: [ConversionCurrenciesViewModel]) {
         self.date = date
         self.conversion = conversion
     }
 }
 
-// MARK: - ConversionCurrenciesModel
-class ConversionCurrenciesModel: NSObject {
+// MARK: - ConversionCurrenciesViewModel
+class ConversionCurrenciesViewModel: NSObject {
     var code: String?
     var quotes: Double?
     

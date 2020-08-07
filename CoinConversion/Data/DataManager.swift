@@ -39,7 +39,7 @@ class DataManager: NSObject {
 
 // MARK: DatabaseQuotes
 extension DataManager {
-    func syncQuotes(with conversionCurrencies: ConversionModel) {
+    func syncQuotes(with conversionCurrencies: ConversionViewModel) {
         self.deleteAllData("ConversionEntity")
         self.savingQuotes(with: conversionCurrencies)
     }
@@ -60,8 +60,8 @@ extension DataManager {
         }
     }
     
-    func fetchDatabaseQuotes() -> ConversionModel? {
-        var conversion: [ConversionCurrenciesModel] = []
+    func fetchDatabaseQuotes() -> ConversionViewModel? {
+        var conversion: [ConversionCurrenciesViewModel] = []
         let quotesEntity = NSFetchRequest<NSFetchRequestResult>(entityName: "ConversionEntity")
         
         do {
@@ -70,16 +70,16 @@ extension DataManager {
             
             for data in objectData {
                 conversion.append(
-                    ConversionCurrenciesModel(code: data.code ?? "", quotes: data.quotes)
+                    ConversionCurrenciesViewModel(code: data.code ?? "", quotes: data.quotes)
                 )
             }
-            return ConversionModel(date: objectData.first!.timestamp, conversion: conversion)
+            return ConversionViewModel(date: objectData.first!.timestamp, conversion: conversion)
         } catch {
             return nil
         }
     }
     
-    private func savingQuotes(with conversionCurrencies: ConversionModel) {
+    private func savingQuotes(with conversionCurrencies: ConversionViewModel) {
         if let quotesEntity = NSEntityDescription.entity(forEntityName: "ConversionEntity", in: viewContext) {
             
             conversionCurrencies.conversion?.forEach { conversionQuotes in

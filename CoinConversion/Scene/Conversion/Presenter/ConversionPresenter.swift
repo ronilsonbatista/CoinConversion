@@ -1,5 +1,5 @@
 //
-//  ConversionViewModel.swift
+//  ConversionPresenter.swift
 //  CoinConversion
 //
 //  Created by Ronilson Batista on 18/07/20.
@@ -14,8 +14,8 @@ enum Conversion {
     case from
 }
 
-// MARK: - ConversionViewModelDelegate
-protocol ConversionViewModelDelegate: class {
+// MARK: - ConversionPresenterDelegate
+protocol ConversionPresenterDelegate: class {
     func didStartLoading()
     func didHideLoading()
     func didUpdateDate(with date: String)
@@ -30,20 +30,21 @@ protocol ConversionViewModelDelegate: class {
 }
 
 // MARK: - Main
-class ConversionViewModel {
-    weak var delegate: ConversionViewModelDelegate?
+class ConversionPresenter {
+    weak var delegate: ConversionPresenterDelegate?
     
-    private var service: CurrenciesConversionService?
+    private var interactor: CurrenciesConversionInteractor?
     private var router: ConversionRouter?
-    private var conversionModel: ConversionModel?
+    private var conversionModel: ConversionViewModel?
     private var dataManager: DataManager?
     
     init(
-        service: CurrenciesConversionService,
+        interactor: CurrenciesConversionInteractor,
         dataManager: DataManager,
         router: ConversionRouter
     ) {
-        self.service = service
+        self.interactor = interactor
+        self.interactor?.delegate = self
         self.dataManager = dataManager
         self.dataManager?.delegate = self
         self.router = router
@@ -52,36 +53,12 @@ class ConversionViewModel {
 }
 
 // MARK: - Custom methods
-extension ConversionViewModel {
-    func fetchQuotes(isRefresh: Bool) {
+extension ConversionPresenter {
+    
+    func fetchQuotes(isRefresh: Bool)  {
         if !hasDatabaseQuotes() || isRefresh {
-            
             delegate?.didStartLoading()
-            
-            service?.fetchQuotes(success: { currenciesConversion in
-                self.delegate?.didHideLoading()
-                
-                switch currenciesConversion.success {
-                case false:
-                    self.handleError(whit: .init(type: .noAuthorized))
-                    return
-                default:
-                    self.conversionModel = self.handleQuotes(
-                        with: currenciesConversion
-                    )
-                    
-                    self.delegate?.didUpdateDate(
-                        with: self.conversionModel?.date?.getDateStringFromUTC() ?? "-"
-                    )
-                    
-                    self.dataManager?.syncQuotes(with: self.conversionModel!)
-                }
-            }, fail: { serviceError in
-                DispatchQueue.main.async {
-                    self.delegate?.didHideLoading()
-                    self.handleError(whit: serviceError)
-                }
-            })
+            interactor?.fetchQuotes()
         }
     }
     
@@ -108,18 +85,18 @@ extension ConversionViewModel {
 }
 
 // MARK: - Private Methods
-extension ConversionViewModel {
-    private func handleQuotes(with quotes: CurrenciesConversion) -> ConversionModel {
+extension ConversionPresenter {
+    private func handleQuotes(with quotes: CurrenciesConversion) -> ConversionViewModel {
         let currencies = quotes.quotes.map {
-            currencies -> ConversionCurrenciesModel in
+            currencies -> ConversionCurrenciesViewModel in
             
-            return ConversionCurrenciesModel(
+            return ConversionCurrenciesViewModel(
                 code: currencies.key,
                 quotes: currencies.value
             )
         }
         
-        return ConversionModel(date: quotes.timestamp, conversion: currencies)
+        return ConversionViewModel(date: quotes.timestamp, conversion: currencies)
     }
     
     private func findLocaleBy(whit currencyCode: String) -> Locale? {
@@ -139,7 +116,7 @@ extension ConversionViewModel {
         return locale
     }
     
-    private func convertCurrency(fromCode: String,toCode: String, value: String, conversion: [ConversionCurrenciesModel]?) -> String? {
+    private func convertCurrency(fromCode: String,toCode: String, value: String, conversion: [ConversionCurrenciesViewModel]?) -> String? {
         let currencyBase = "USD"
         
         guard let conversion = conversion else {
@@ -235,7 +212,7 @@ extension ConversionViewModel {
 }
 
 // MARK: - Aux Methods
-extension ConversionViewModel {
+extension ConversionPresenter {
     func formatCurrency( currencyCode: String, amount: String ) -> String? {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
@@ -250,7 +227,7 @@ extension ConversionViewModel {
         return result
     }
     
-    func returnQuotes(conversion: [ConversionCurrenciesModel], currencyBase: String, code: String) -> ConversionCurrenciesModel? {
+    func returnQuotes(conversion: [ConversionCurrenciesViewModel], currencyBase: String, code: String) -> ConversionCurrenciesViewModel? {
         if let quotes = conversion.first(
             where: { $0.code == currencyBase + code }
             ) {
@@ -267,15 +244,43 @@ extension ConversionViewModel {
     }
 }
 
+// MARK: - CurrenciesConversionInteractorDelegate
+extension ConversionPresenter: CurrenciesConversionInteractorDelegate {
+    func quotesFetched(with quotes: CurrenciesConversion) {
+        self.delegate?.didHideLoading()
+        
+        switch quotes.success {
+        case false:
+            handleError(whit: .init(type: .noAuthorized))
+            return
+        default:
+            conversionModel = handleQuotes(
+                with: quotes
+            )
+            
+            self.delegate?.didUpdateDate(
+                with: conversionModel?.date?.getDateStringFromUTC() ?? "-"
+            )
+            
+            dataManager?.syncQuotes(with: conversionModel!)
+        }
+    }
+    
+    func handleFailure(with serviceError: ServiceError) {
+        delegate?.didHideLoading()
+        handleError(whit: serviceError)
+    }
+}
+
 // MARK: - ConversionRouterDelegate
-extension ConversionViewModel: ConversionRouterDelegate {
+extension ConversionPresenter: ConversionRouterDelegate {
     func currencyFetched(_ code: String, _ name: String, _ conversion: Conversion) {
         delegate?.didReloadData(code: code, name: name, conversion: conversion)
     }
 }
 
 // MARK: - DataManagerDelegate
-extension ConversionViewModel: DataManagerDelegate {
+extension ConversionPresenter: DataManagerDelegate {
     func didDataManagerFail(with reason: String) {
         delegate?.didFail(with: "Erro encontrado",
                           message: "Desculpe-nos pelo erro. Não conseguimos salvar seus dados para uso off-line. \nMotivo: \(reason)",
