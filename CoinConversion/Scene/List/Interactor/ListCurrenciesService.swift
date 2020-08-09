@@ -1,5 +1,5 @@
 //
-//  ListCurrenciesService.swift
+//  ListCurrenciesInteractor.swift
 //  CoinConversion
 //
 //  Created by Ronilson Batista on 18/07/20.
@@ -8,7 +8,14 @@
 
 import Foundation
 
-final class ListCurrenciesService: NSObject {
+
+// MARK: - CurrenciesConversionInteractorDelegate
+protocol ListCurrenciesInteractorDelegate: class {
+    func quotesFetched(with quotes: CurrenciesConversion)
+    func handleFailure(with serviceError: ServiceError)
+}
+
+final class ListCurrenciesInteractor: NSObject {
     
     func fetchListCurrencies(success: @escaping (ListCurrencies) -> Void,
                              fail: @escaping (_ error: ServiceError) -> Void

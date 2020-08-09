@@ -23,7 +23,7 @@
 		D19ED5A724C9C59B00B59139 /* CoinConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19ED5A624C9C59B00B59139 /* CoinConversionTests.swift */; };
 		D1A1B12224C4E66D00C88F6F /* ListCurrenciesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1B12024C4E66D00C88F6F /* ListCurrenciesViewController.swift */; };
 		D1A1B12324C4E66D00C88F6F /* ListCurrenciesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D1A1B12124C4E66D00C88F6F /* ListCurrenciesViewController.xib */; };
-		D1A1B12524C4E6A300C88F6F /* ListCurrenciesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1B12424C4E6A300C88F6F /* ListCurrenciesViewModel.swift */; };
+		D1A1B12524C4E6A300C88F6F /* ListCurrenciesPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1B12424C4E6A300C88F6F /* ListCurrenciesPresenter.swift */; };
 		D1A7E0D524C613F200A71E91 /* ListCurrenciesViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A7E0D324C613F200A71E91 /* ListCurrenciesViewCell.swift */; };
 		D1A7E0D624C613F200A71E91 /* ListCurrenciesViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D1A7E0D424C613F200A71E91 /* ListCurrenciesViewCell.xib */; };
 		D1A7E0D824C6201F00A71E91 /* ListCurrenciesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A7E0D724C6201F00A71E91 /* ListCurrenciesModel.swift */; };
@@ -38,7 +38,7 @@
 		D1C92B8924C3BCF60049E64B /* ServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B8824C3BCF60049E64B /* ServiceRequest.swift */; };
 		D1C92B8B24C3BD810049E64B /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B8A24C3BD810049E64B /* Connectivity.swift */; };
 		D1C92B8D24C3BDA20049E64B /* ServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B8C24C3BDA20049E64B /* ServiceError.swift */; };
-		D1C92B9324C3C3D10049E64B /* ListCurrenciesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B9224C3C3D10049E64B /* ListCurrenciesService.swift */; };
+		D1C92B9324C3C3D10049E64B /* ListCurrenciesInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B9224C3C3D10049E64B /* ListCurrenciesInteractor.swift */; };
 		D1C92B9624C3C9550049E64B /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B9524C3C9550049E64B /* AppEnvironment.swift */; };
 		D1C92B9824C3CA910049E64B /* ListCurrencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B9724C3CA910049E64B /* ListCurrencies.swift */; };
 		D1D0C7E124C9FFF000EB2464 /* ListCurrenciesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D0C7E024C9FFF000EB2464 /* ListCurrenciesTest.swift */; };
@@ -88,7 +88,7 @@
 		D19ED5A824C9C59B00B59139 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1A1B12024C4E66D00C88F6F /* ListCurrenciesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesViewController.swift; sourceTree = "<group>"; };
 		D1A1B12124C4E66D00C88F6F /* ListCurrenciesViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListCurrenciesViewController.xib; sourceTree = "<group>"; };
-		D1A1B12424C4E6A300C88F6F /* ListCurrenciesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesViewModel.swift; sourceTree = "<group>"; };
+		D1A1B12424C4E6A300C88F6F /* ListCurrenciesPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesPresenter.swift; sourceTree = "<group>"; };
 		D1A7E0D324C613F200A71E91 /* ListCurrenciesViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesViewCell.swift; sourceTree = "<group>"; };
 		D1A7E0D424C613F200A71E91 /* ListCurrenciesViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListCurrenciesViewCell.xib; sourceTree = "<group>"; };
 		D1A7E0D724C6201F00A71E91 /* ListCurrenciesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesModel.swift; sourceTree = "<group>"; };
@@ -105,7 +105,7 @@
 		D1C92B8824C3BCF60049E64B /* ServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRequest.swift; sourceTree = "<group>"; };
 		D1C92B8A24C3BD810049E64B /* Connectivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectivity.swift; sourceTree = "<group>"; };
 		D1C92B8C24C3BDA20049E64B /* ServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceError.swift; sourceTree = "<group>"; };
-		D1C92B9224C3C3D10049E64B /* ListCurrenciesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesService.swift; sourceTree = "<group>"; };
+		D1C92B9224C3C3D10049E64B /* ListCurrenciesInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesInteractor.swift; sourceTree = "<group>"; };
 		D1C92B9524C3C9550049E64B /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		D1C92B9724C3CA910049E64B /* ListCurrencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrencies.swift; sourceTree = "<group>"; };
 		D1D0C7E024C9FFF000EB2464 /* ListCurrenciesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesTest.swift; sourceTree = "<group>"; };
@@ -156,6 +156,39 @@
 				16EB88BABF30B685F8537520 /* Pods-CoinConversion.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D138AC9724E0675200C86208 /* Interactor */ = {
+			isa = PBXGroup;
+			children = (
+				D1C92B9224C3C3D10049E64B /* ListCurrenciesInteractor.swift */,
+			);
+			path = Interactor;
+			sourceTree = "<group>";
+		};
+		D138AC9824E0676000C86208 /* Presenter */ = {
+			isa = PBXGroup;
+			children = (
+				D1A1B12424C4E6A300C88F6F /* ListCurrenciesPresenter.swift */,
+			);
+			path = Presenter;
+			sourceTree = "<group>";
+		};
+		D138AC9924E0676900C86208 /* Entity */ = {
+			isa = PBXGroup;
+			children = (
+				D1A7E0D724C6201F00A71E91 /* ListCurrenciesModel.swift */,
+				D1C92B9724C3CA910049E64B /* ListCurrencies.swift */,
+			);
+			path = Entity;
+			sourceTree = "<group>";
+		};
+		D138AC9A24E0677000C86208 /* Router */ = {
+			isa = PBXGroup;
+			children = (
+				D13C62DA24C7676500F76757 /* ListCurrenciesRouter.swift */,
+			);
+			path = Router;
 			sourceTree = "<group>";
 		};
 		D139A4E724C8DAC900006ABF /* Data */ = {
@@ -239,7 +272,7 @@
 				D139A4E724C8DAC900006ABF /* Data */,
 				D1C92B7924C3BAAE0049E64B /* Helpers */,
 				D1C92B7A24C3BAB90049E64B /* Scene */,
-				D1C92B9024C3BFAD0049E64B /* Services */,
+				D1C92B7B24C3BC180049E64B /* Service */,
 			);
 			path = CoinConversion;
 			sourceTree = "<group>";
@@ -269,7 +302,6 @@
 			children = (
 				D14786F024C50B7800F594AC /* Components */,
 				D1D51C7424C3DDD200B8D165 /* Extension */,
-				D1C92B7B24C3BC180049E64B /* ServiceHelper */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -284,7 +316,7 @@
 			path = Scene;
 			sourceTree = "<group>";
 		};
-		D1C92B7B24C3BC180049E64B /* ServiceHelper */ = {
+		D1C92B7B24C3BC180049E64B /* Service */ = {
 			isa = PBXGroup;
 			children = (
 				D1C92B8A24C3BD810049E64B /* Connectivity.swift */,
@@ -295,33 +327,7 @@
 				D1C92B8624C3BCD90049E64B /* ServiceManagerProtocol.swift */,
 				D1C92B8824C3BCF60049E64B /* ServiceRequest.swift */,
 			);
-			path = ServiceHelper;
-			sourceTree = "<group>";
-		};
-		D1C92B9024C3BFAD0049E64B /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				D1D51C6224C3D39000B8D165 /* Conversion */,
-				D1C92B9124C3C15F0049E64B /* List */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		D1C92B9124C3C15F0049E64B /* List */ = {
-			isa = PBXGroup;
-			children = (
-				D1C92B9424C3C8400049E64B /* Entity */,
-				D1C92B9224C3C3D10049E64B /* ListCurrenciesService.swift */,
-			);
-			path = List;
-			sourceTree = "<group>";
-		};
-		D1C92B9424C3C8400049E64B /* Entity */ = {
-			isa = PBXGroup;
-			children = (
-				D1C92B9724C3CA910049E64B /* ListCurrencies.swift */,
-			);
-			path = Entity;
+			path = Service;
 			sourceTree = "<group>";
 		};
 		D1D51C6124C3D2CC00B8D165 /* Conversion */ = {
@@ -336,20 +342,14 @@
 			path = Conversion;
 			sourceTree = "<group>";
 		};
-		D1D51C6224C3D39000B8D165 /* Conversion */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Conversion;
-			sourceTree = "<group>";
-		};
 		D1D51C6824C3D51700B8D165 /* List */ = {
 			isa = PBXGroup;
 			children = (
 				D1A1B12624C4E6B300C88F6F /* View */,
-				D1A7E0D724C6201F00A71E91 /* ListCurrenciesModel.swift */,
-				D1A1B12424C4E6A300C88F6F /* ListCurrenciesViewModel.swift */,
-				D13C62DA24C7676500F76757 /* ListCurrenciesRouter.swift */,
+				D138AC9724E0675200C86208 /* Interactor */,
+				D138AC9824E0676000C86208 /* Presenter */,
+				D138AC9924E0676900C86208 /* Entity */,
+				D138AC9A24E0677000C86208 /* Router */,
 			);
 			path = List;
 			sourceTree = "<group>";
@@ -599,7 +599,7 @@
 				D1A7E0D824C6201F00A71E91 /* ListCurrenciesModel.swift in Sources */,
 				D14786F424C50BA900F594AC /* RadioButton.m in Sources */,
 				D1D51C7324C3DA6900B8D165 /* ConversionPresenter.swift in Sources */,
-				D1A1B12524C4E6A300C88F6F /* ListCurrenciesViewModel.swift in Sources */,
+				D1A1B12524C4E6A300C88F6F /* ListCurrenciesPresenter.swift in Sources */,
 				D1C92B9624C3C9550049E64B /* AppEnvironment.swift in Sources */,
 				D1D51C6A24C3D7A700B8D165 /* ConversionRouter.swift in Sources */,
 				D1C92B8924C3BCF60049E64B /* ServiceRequest.swift in Sources */,
@@ -611,7 +611,7 @@
 				D13C62DB24C7676500F76757 /* ListCurrenciesRouter.swift in Sources */,
 				D1D51C6C24C3D8E200B8D165 /* AppRouter.swift in Sources */,
 				D1E5FF9724C66C2400B1FD51 /* EmptySearchViewCell.swift in Sources */,
-				D1C92B9324C3C3D10049E64B /* ListCurrenciesService.swift in Sources */,
+				D1C92B9324C3C3D10049E64B /* ListCurrenciesInteractor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,0 +1,44 @@
+Pods/Alamofire/LICENSE
+Pods/Alamofire/README.md
+Pods/Alamofire/Source/AFError.swift
+Pods/Alamofire/Source/Alamofire.swift
+Pods/Alamofire/Source/DispatchQueue+Alamofire.swift
+Pods/Alamofire/Source/MultipartFormData.swift
+Pods/Alamofire/Source/NetworkReachabilityManager.swift
+Pods/Alamofire/Source/Notifications.swift
+Pods/Alamofire/Source/ParameterEncoding.swift
+Pods/Alamofire/Source/Request.swift
+Pods/Alamofire/Source/Response.swift
+Pods/Alamofire/Source/ResponseSerialization.swift
+Pods/Alamofire/Source/Result.swift
+Pods/Alamofire/Source/ServerTrustPolicy.swift
+Pods/Alamofire/Source/SessionDelegate.swift
+Pods/Alamofire/Source/SessionManager.swift
+Pods/Alamofire/Source/TaskDelegate.swift
+Pods/Alamofire/Source/Timeline.swift
+Pods/Alamofire/Source/Validation.swift
+Pods/Manifest.lock
+Pods/Pods.xcodeproj/project.pbxproj
+Pods/Pods.xcodeproj/xcuserdata/ronilsonbatista.xcuserdatad/xcschemes/Alamofire.xcscheme
+Pods/Pods.xcodeproj/xcuserdata/ronilsonbatista.xcuserdatad/xcschemes/Pods-CoinConversion.xcscheme
+Pods/Pods.xcodeproj/xcuserdata/ronilsonbatista.xcuserdatad/xcschemes/xcschememanagement.plist
+Pods/Target Support Files/Alamofire/Alamofire-Info.plist
+Pods/Target Support Files/Alamofire/Alamofire-dummy.m
+Pods/Target Support Files/Alamofire/Alamofire-prefix.pch
+Pods/Target Support Files/Alamofire/Alamofire-umbrella.h
+Pods/Target Support Files/Alamofire/Alamofire.debug.xcconfig
+Pods/Target Support Files/Alamofire/Alamofire.modulemap
+Pods/Target Support Files/Alamofire/Alamofire.release.xcconfig
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-Info.plist
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-acknowledgements.markdown
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-acknowledgements.plist
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-dummy.m
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-frameworks-Debug-input-files.xcfilelist
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-frameworks-Debug-output-files.xcfilelist
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-frameworks-Release-input-files.xcfilelist
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-frameworks-Release-output-files.xcfilelist
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-frameworks.sh
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion-umbrella.h
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion.debug.xcconfig
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion.modulemap
+Pods/Target Support Files/Pods-CoinConversion/Pods-CoinConversion.release.xcconfig

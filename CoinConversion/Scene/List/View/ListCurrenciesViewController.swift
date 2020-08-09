@@ -11,11 +11,11 @@ import UIKit
 // MARK: - Main
 class ListCurrenciesViewController: UITableViewController {
     
-    var viewModel: ListCurrenciesViewModel?
+    var presenter: ListCurrenciesPresenter?
     private let searchController = UISearchController(searchResultsController: nil)
     
-    init(viewModel: ListCurrenciesViewModel) {
-        self.viewModel = viewModel
+    init(presenter: ListCurrenciesPresenter) {
+        self.presenter = presenter
         super.init(nibName: ListCurrenciesViewController.nibName, bundle: nil)
     }
     
@@ -34,8 +34,8 @@ extension ListCurrenciesViewController {
         setupBarButton()
         registerTableView()
         
-        viewModel?.delegate = self
-        viewModel?.fetchListCurrencies(isRefresh: false)
+        presenter?.delegate = self
+        presenter?.fetchListCurrencies(isRefresh: false)
     }
 }
 
@@ -63,11 +63,11 @@ extension ListCurrenciesViewController {
     }
     
     @objc private func refreshButtonTouched(sender: UIBarButtonItem) {
-        viewModel?.fetchListCurrencies(isRefresh: true)
+        presenter?.fetchListCurrencies(isRefresh: true)
     }
     
     private func doLoading(action: UIAlertAction) {
-        viewModel?.fetchListCurrencies(isRefresh: true)
+        presenter?.fetchListCurrencies(isRefresh: true)
     }
     
     private func setupSearchController() -> UISearchController {
@@ -108,11 +108,11 @@ extension ListCurrenciesViewController {
 extension ListCurrenciesViewController: UISearchResultsUpdating, UISearchControllerDelegate {
     func updateSearchResults(for searchController: UISearchController) {
         if let text = searchController.searchBar.text, !text.isEmpty {
-            viewModel?.searchListCurrencies(whit: text)
+            presenter?.searchListCurrencies(whit: text)
         }
         
         if let text = searchController.searchBar.text, text.isEmpty {
-            viewModel?.searchListCurrencies(whit: "")
+            presenter?.searchListCurrencies(whit: "")
         }
     }
 }
@@ -124,7 +124,7 @@ extension ListCurrenciesViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let listCurrencies = viewModel?.listCurrencies else {
+        guard let listCurrencies = presenter?.listCurrencies else {
             return 0
         }
         if listCurrencies.count == 0 { return 1 }
@@ -136,7 +136,7 @@ extension ListCurrenciesViewController {
             fatalError("Couldn't dequeue \(ListCurrenciesSectionViewCell.identifier)")
         }
         
-        if !(viewModel?.isSort ?? false) {
+        if !(presenter?.isSort ?? false) {
             cell.setupRadioButtons(tag: 0, buttons: cell.sortByNameButton)
         }
         
@@ -145,7 +145,7 @@ extension ListCurrenciesViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let listCurrencies = viewModel?.listCurrencies else {
+        guard let listCurrencies = presenter?.listCurrencies else {
             return UITableViewCell()
         }
         
@@ -175,7 +175,7 @@ extension ListCurrenciesViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let listCurrencies = viewModel?.listCurrencies else {
+        guard let listCurrencies = presenter?.listCurrencies else {
             fatalError("listCurrencies can't be nil")
         }
         
@@ -185,7 +185,7 @@ extension ListCurrenciesViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let currencies = listCurrencies[indexPath.row]
-            self.viewModel?.chosenCurrencies(code: currencies.code, name: currencies.name)
+            self.presenter?.chosenCurrencies(code: currencies.code, name: currencies.name)
         }
     }
 }
@@ -197,7 +197,7 @@ extension ListCurrenciesViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if viewModel?.listCurrencies?.count == 0 {
+        if presenter?.listCurrencies?.count == 0 {
             return 230
         }
         return 100
@@ -208,16 +208,16 @@ extension ListCurrenciesViewController {
 extension ListCurrenciesViewController: ListCurrenciesSectionViewCellDelegate {
     func didTapSortBy(_ sortType: SortType) {
         
-        guard let listCurrencies = viewModel?.listCurrencies else {
+        guard let listCurrencies = presenter?.listCurrencies else {
             fatalError("listCurrencies cannot be null")
         }
         
-        viewModel?.fetchLisSortBy(sortType, with: listCurrencies)
+        presenter?.fetchLisSortBy(sortType, with: listCurrencies)
     }
 }
 
-// MARK: - ListCurrenciesViewModelDelegate
-extension ListCurrenciesViewController: ListCurrenciesViewModelDelegate {
+// MARK: - ListCurrenciesPresenterDelegate
+extension ListCurrenciesViewController: ListCurrenciesPresenterDelegate {
     func didStartLoading() {
         showActivityIndicator()
     }

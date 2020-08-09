@@ -20,8 +20,8 @@ class ListCurrenciesRouter {
     
     func createListCurrenciesScreen(conversion: Conversion) {
         let viewController = ListCurrenciesViewController(
-            viewModel: ListCurrenciesViewModel(
-                service: ListCurrenciesService(),
+            presenter: ListCurrenciesPresenter(
+                interactor: ListCurrenciesInteractor(),
                 conversion: conversion,
                 dataManager: DataManager(),
                 router: self

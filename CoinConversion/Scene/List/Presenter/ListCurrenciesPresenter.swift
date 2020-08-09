@@ -1,5 +1,5 @@
 //
-//  ListCurrenciesViewModel.swift
+//  ListCurrenciesPresenter.swift
 //  CoinConversion
 //
 //  Created by Ronilson Batista on 19/07/20.
@@ -14,8 +14,8 @@ enum SortType {
     case code
 }
 
-// MARK: - ListCurrenciesViewModelDelegate
-protocol ListCurrenciesViewModelDelegate: class {
+// MARK: - ListCurrenciesPresenterDelegate
+protocol ListCurrenciesPresenterDelegate: class {
     func didStartLoading()
     func didHideLoading()
     func didReloadData()
@@ -28,10 +28,10 @@ protocol ListCurrenciesViewModelDelegate: class {
 }
 
 // MARK: - Main
-class ListCurrenciesViewModel {
-    weak var delegate: ListCurrenciesViewModelDelegate?
+class ListCurrenciesPresenter {
+    weak var delegate: ListCurrenciesPresenterDelegate?
     
-    private var service: ListCurrenciesService?
+    private var interactor: ListCurrenciesInteractor?
     private var conversion: Conversion?
     private var router: ListCurrenciesRouter?
     private var currencies: [ListCurrenciesModel]?
@@ -40,12 +40,13 @@ class ListCurrenciesViewModel {
     private(set) var listCurrencies: [ListCurrenciesModel]?
     private(set) var isSort = Bool()
     
-    init(service: ListCurrenciesService,
+    init(interactor: ListCurrenciesInteractor,
          conversion: Conversion,
          dataManager: DataManager,
          router: ListCurrenciesRouter
     ) {
-        self.service = service
+        self.interactor = interactor
+        self.interactor?.delegate = self
         self.conversion = conversion
         self.dataManager = dataManager
         self.dataManager?.delegate = self
@@ -54,40 +55,12 @@ class ListCurrenciesViewModel {
 }
 
 // MARK: - PublicMethods
-extension ListCurrenciesViewModel {
+extension ListCurrenciesPresenter {
     func fetchListCurrencies(isRefresh: Bool) {
         if !hasDatabaseListCurrencies() || isRefresh {
-            
             delegate?.didStartLoading()
             isSort = false
-            
-            service?.fetchListCurrencies(success: { listCurrencies in
-                self.delegate?.didHideLoading()
-                
-                switch listCurrencies.success {
-                case false:
-                    self.handleError(whit: .init(type: .noAuthorized))
-                    return
-                default:
-                    self.currencies = self.handleListCurrencies(
-                        with: listCurrencies
-                    )
-                    
-                    self.listCurrencies = self.handleListCurrencies(
-                        with: listCurrencies
-                    )
-                    
-                    DispatchQueue.main.async {
-                        self.dataManager?.syncListCurrencies(currencies: self.listCurrencies!)
-                        self.delegate?.didReloadData()
-                    }
-                }
-            }, fail: { serviceError in
-                DispatchQueue.main.async {
-                    self.delegate?.didHideLoading()
-                    self.handleError(whit: serviceError)
-                }
-            })
+            interactor?.fetchListCurrencies()
         }
     }
     
@@ -126,8 +99,38 @@ extension ListCurrenciesViewModel {
     }
 }
 
+// MARK: - ListCurrenciesInteractorDelegate
+extension ListCurrenciesPresenter: ListCurrenciesInteractorDelegate {
+    func currenciesFetched(with listCurrencies: ListCurrencies) {
+        delegate?.didHideLoading()
+        
+        switch listCurrencies.success {
+        case false:
+            self.handleError(whit: .init(type: .noAuthorized))
+            return
+        default:
+            self.currencies = self.handleListCurrencies(
+                with: listCurrencies
+            )
+            self.listCurrencies = self.handleListCurrencies(
+                with: listCurrencies
+            )
+            
+            DispatchQueue.main.async {
+                self.dataManager?.syncListCurrencies(currencies: self.listCurrencies!)
+                self.delegate?.didReloadData()
+            }
+        }
+    }
+    
+    func handleFailure(with serviceError: ServiceError) {
+        delegate?.didHideLoading()
+        handleError(whit: serviceError)
+    }
+}
+
 // MARK: - PrivateMethods
-extension ListCurrenciesViewModel {
+extension ListCurrenciesPresenter {
     private func handleListCurrencies(with listCurrencies: ListCurrencies) -> [ListCurrenciesModel] {
         var list = listCurrencies.currencies.map { list -> ListCurrenciesModel in
             return ListCurrenciesModel(
@@ -217,8 +220,9 @@ extension ListCurrenciesViewModel {
         )
     }
 }
+
 // MARK: - DataManagerDelegate
-extension ListCurrenciesViewModel: DataManagerDelegate {
+extension ListCurrenciesPresenter: DataManagerDelegate {
     func didDataManagerFail(with reason: String) {
         delegate?.didFail(with: "Erro encontrado",
                           message: "Desculpe-nos pelo erro. Não conseguimos salvar seus dados para uso off-line. \nMotivo: \(reason)",
@@ -228,3 +232,4 @@ extension ListCurrenciesViewModel: DataManagerDelegate {
         )
     }
 }
+
