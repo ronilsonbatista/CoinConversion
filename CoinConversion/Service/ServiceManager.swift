@@ -28,7 +28,7 @@ final class ServiceManager: ServiceManagerProtocol {
         }()
         
         // HTTP method used
-        let requestMethod = HTTPMethod(rawValue: method.rawValue)!
+        let requestMethod = HTTPMethod(rawValue: method.rawValue)
         
         if !Connectivity.isConnectedToInternet() {
             failure(ServiceError(type: .noConnection))
@@ -36,7 +36,7 @@ final class ServiceManager: ServiceManagerProtocol {
         }
         
         // Request
-        Alamofire.request(url,
+        AF.request(url,
                           method: requestMethod,
                           parameters: parameters,
                           encoding: requestEncoding,
@@ -76,7 +76,7 @@ final class ServiceManager: ServiceManagerProtocol {
         }
     }
     
-    private func handleFailure(with response: DataResponse<Any>) -> ServiceError {
+    private func handleFailure(with response: DataResponse<Any, AFError>) -> ServiceError {
         
         guard let statusCode = response.response?.statusCode else {
             return ServiceError(type: .notFound)
