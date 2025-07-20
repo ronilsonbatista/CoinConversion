@@ -10,7 +10,11 @@ import UIKit
 
 extension UIApplication {
     func topMostViewController() -> UIViewController? {
-        let keyWindow = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        let keyWindow = connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+
         return keyWindow?.rootViewController?.topMostViewController()
     }
 }
