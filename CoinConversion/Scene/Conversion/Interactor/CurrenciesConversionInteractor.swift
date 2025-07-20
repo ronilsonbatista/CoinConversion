@@ -9,7 +9,7 @@
 import Foundation
 
 // MARK: - CurrenciesConversionInteractorDelegate
-protocol CurrenciesConversionInteractorDelegate: class {
+protocol CurrenciesConversionInteractorDelegate: AnyObject {
     func quotesFetched(with quotes: CurrenciesConversion)
     func handleFailure(with serviceError: ServiceError)
 }

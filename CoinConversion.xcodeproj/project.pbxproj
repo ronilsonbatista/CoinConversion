@@ -24,6 +24,7 @@
 		D1A1B12224C4E66D00C88F6F /* ListCurrenciesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1B12024C4E66D00C88F6F /* ListCurrenciesViewController.swift */; };
 		D1A1B12324C4E66D00C88F6F /* ListCurrenciesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D1A1B12124C4E66D00C88F6F /* ListCurrenciesViewController.xib */; };
 		D1A1B12524C4E6A300C88F6F /* ListCurrenciesPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1B12424C4E6A300C88F6F /* ListCurrenciesPresenter.swift */; };
+		D1A4AED22E2D2A1C0075616D /* PersistenceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A4AED12E2D2A1A0075616D /* PersistenceError.swift */; };
 		D1A7E0D524C613F200A71E91 /* ListCurrenciesViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A7E0D324C613F200A71E91 /* ListCurrenciesViewCell.swift */; };
 		D1A7E0D624C613F200A71E91 /* ListCurrenciesViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D1A7E0D424C613F200A71E91 /* ListCurrenciesViewCell.xib */; };
 		D1A7E0D824C6201F00A71E91 /* ListCurrenciesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A7E0D724C6201F00A71E91 /* ListCurrenciesModel.swift */; };
@@ -99,6 +100,7 @@
 		D1A1B12024C4E66D00C88F6F /* ListCurrenciesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesViewController.swift; sourceTree = "<group>"; };
 		D1A1B12124C4E66D00C88F6F /* ListCurrenciesViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListCurrenciesViewController.xib; sourceTree = "<group>"; };
 		D1A1B12424C4E6A300C88F6F /* ListCurrenciesPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesPresenter.swift; sourceTree = "<group>"; };
+		D1A4AED12E2D2A1A0075616D /* PersistenceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceError.swift; sourceTree = "<group>"; };
 		D1A7E0D324C613F200A71E91 /* ListCurrenciesViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesViewCell.swift; sourceTree = "<group>"; };
 		D1A7E0D424C613F200A71E91 /* ListCurrenciesViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListCurrenciesViewCell.xib; sourceTree = "<group>"; };
 		D1A7E0D724C6201F00A71E91 /* ListCurrenciesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesModel.swift; sourceTree = "<group>"; };
@@ -187,6 +189,7 @@
 		D139A4E724C8DAC900006ABF /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				D1A4AED12E2D2A1A0075616D /* PersistenceError.swift */,
 				D139A4E824C8DAF300006ABF /* CoinConversion.xcdatamodeld */,
 				D139A4EB24C8DB0900006ABF /* CoreDataStack.swift */,
 				D139A4ED24C8DCA900006ABF /* DataManager.swift */,
@@ -538,6 +541,7 @@
 				D139A4EC24C8DB0900006ABF /* CoreDataStack.swift in Sources */,
 				D1D51C6524C3D3CB00B8D165 /* CurrenciesConversion.swift in Sources */,
 				D14786EC24C5093900F594AC /* ListCurrenciesSectionViewCell.swift in Sources */,
+				D1A4AED22E2D2A1C0075616D /* PersistenceError.swift in Sources */,
 				D1C92B8D24C3BDA20049E64B /* ServiceError.swift in Sources */,
 				D1C92B8724C3BCD90049E64B /* ServiceManagerProtocol.swift in Sources */,
 				D1C92B8324C3BC8F0049E64B /* ServiceHTTPMethod.swift in Sources */,

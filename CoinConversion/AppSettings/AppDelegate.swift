@@ -26,7 +26,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("didDiscardSceneSessions")
     }
     
-    func applicationWillTerminate(_ application: UIApplication) {
-        coreDataStack.saveContext()
+    func applicationWillTerminate(_ application: UIApplication) {        
+        do {
+            try CoreDataStack.shared.saveContext()
+        } catch let error as PersistenceError {
+            print("Falha ao salvar: \(error.localizedDescription)")
+        } catch {
+            print("Erro desconhecido: \(error.localizedDescription)")
+        }
     }
 }

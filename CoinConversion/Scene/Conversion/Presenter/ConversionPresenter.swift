@@ -15,7 +15,7 @@ enum Conversion {
 }
 
 // MARK: - ConversionPresenterDelegate
-protocol ConversionPresenterDelegate: class {
+protocol ConversionPresenterDelegate: AnyObject {
     func didStartLoading()
     func didHideLoading()
     func didUpdateDate(with date: String)
@@ -281,12 +281,12 @@ extension ConversionPresenter: ConversionRouterDelegate {
 
 // MARK: - DataManagerDelegate
 extension ConversionPresenter: DataManagerDelegate {
-    func didDataManagerFail(with reason: String) {
+    func dataManager(didFailWith error: PersistenceError) {
         delegate?.didFail(with: "Erro encontrado",
-                          message: "Desculpe-nos pelo erro. Não conseguimos salvar seus dados para uso off-line. \nMotivo: \(reason)",
-            buttonTitle: "Continuar Navegando",
-            noConnection: false,
-            dataSave: false
-        )
+                          message: "Desculpe-nos pelo erro. Não conseguimos salvar seus dados para uso off-line. \nMotivo: \(error)",
+                          buttonTitle: "Continuar Navegando",
+                          noConnection: false,
+                          dataSave: false)
     }
 }
+

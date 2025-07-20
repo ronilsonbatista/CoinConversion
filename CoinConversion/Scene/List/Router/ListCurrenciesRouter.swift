@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 // MARK: - ConversionViewModelDelegate
-protocol ListCurrenciesRouterDelegate: class {
+protocol ListCurrenciesRouterDelegate: AnyObject {
     func currencyFetched(_ code: String, _ name: String, _ conversion: Conversion)
 }
 

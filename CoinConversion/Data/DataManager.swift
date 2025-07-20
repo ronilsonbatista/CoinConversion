@@ -8,156 +8,136 @@
 
 import CoreData
 
-protocol DataManagerDelegate: class {
-    func didDataManagerFail(with reason: String)
+// MARK: - DataManagerDelegate
+protocol DataManagerDelegate: AnyObject {
+    func dataManager(didFailWith error: PersistenceError)
 }
 
 // MARK: Main
-class DataManager: NSObject {
+final class DataManager {
     
     weak var delegate: DataManagerDelegate?
-    private var coreDataStack = CoreDataStack.shared
     
-    var viewContext: NSManagedObjectContext {
-        return coreDataStack.persistentContainer.viewContext
-    }
+    private let coreDataStack: CoreDataStack
+    private let context: NSManagedObjectContext
     
-    private func deleteAllData(_ entity:String) {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
-        fetchRequest.returnsObjectsAsFaults = false
-        do {
-            let results = try viewContext.fetch(fetchRequest)
-            for object in results {
-                guard let objectData = object as? NSManagedObject else { continue }
-                viewContext.delete(objectData)
-            }
-        } catch {
-            delegate?.didDataManagerFail(with: "Ao Deletar \(entity) ocorreu um error." )
-        }
+    init(coreDataStack: CoreDataStack = .shared) {
+        self.coreDataStack = coreDataStack
+        self.context = coreDataStack.persistentContainer.viewContext
     }
 }
 
-// MARK: DatabaseQuotes
+// MARK: - Quotes
 extension DataManager {
-    func syncQuotes(with conversionCurrencies: ConversionViewModel) {
-        self.deleteAllData("ConversionEntity")
-        self.savingQuotes(with: conversionCurrencies)
+    func syncQuotes(with viewModel: ConversionViewModel) {
+        deleteAllQuotes() 
+        saveQuotes(with: viewModel)
     }
     
     func hasDatabaseQuotes() -> Bool {
-        let conversionRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ConversionEntity")
-        do {
-            let conversionResult = try viewContext.fetch(conversionRequest) as? [ConversionEntity]
-            if conversionResult?.count ?? 0 > 0 {
-                return true
-            } else {
-                return false
-            }
-        } catch let error as NSError {
-            print("error \(error), \(error.userInfo)")
-            delegate?.didDataManagerFail(with: "\(error.userInfo)" )
-            return false
-        }
+        !fetchQuotesEntities().isEmpty
     }
     
     func fetchDatabaseQuotes() -> ConversionViewModel? {
-        var conversion: [ConversionCurrenciesViewModel] = []
-        let quotesEntity = NSFetchRequest<NSFetchRequestResult>(entityName: "ConversionEntity")
+        let entities = fetchQuotesEntities()
+        guard let first = entities.first else { return nil }
         
-        do {
-            let quotesData = try viewContext.fetch(quotesEntity) as? [ConversionEntity]
-            guard let objectData = quotesData else { return nil }
-            
-            for data in objectData {
-                conversion.append(
-                    ConversionCurrenciesViewModel(code: data.code ?? "", quotes: data.quotes)
-                )
-            }
-            return ConversionViewModel(date: objectData.first!.timestamp, conversion: conversion)
-        } catch {
-            return nil
+        let conversions = entities.map {
+            ConversionCurrenciesViewModel(code: $0.code ?? "", quotes: $0.quotes)
         }
+        return ConversionViewModel(date: first.timestamp, conversion: conversions)
+    }
+}
+
+// MARK: - Private / Quotes
+private extension DataManager {
+    func saveQuotes(with viewModel: ConversionViewModel) {
+        viewModel.conversion?.forEach { quoteVM in
+            let entity = ConversionEntity(context: context)
+            entity.code = quoteVM.code
+            entity.quotes = quoteVM.quotes ?? 0.0
+            entity.timestamp = viewModel.date ?? 0
+        }
+        saveContext()
     }
     
-    private func savingQuotes(with conversionCurrencies: ConversionViewModel) {
-        if let quotesEntity = NSEntityDescription.entity(forEntityName: "ConversionEntity", in: viewContext) {
-            
-            conversionCurrencies.conversion?.forEach { conversionQuotes in
-                
-                let conversion = NSManagedObject(entity: quotesEntity, insertInto: viewContext)
-                conversion.setValue(conversionQuotes.code, forKeyPath: "code")
-                conversion.setValue(conversionQuotes.quotes, forKey: "quotes")
-                conversion.setValue(conversionCurrencies.date, forKey: "timestamp")
-                
-            }
-            do {
-                try viewContext.save()
-            } catch let error as NSError {
-                print("Could not save. \(error), \(error.userInfo)")
-                delegate?.didDataManagerFail(with: "\(error.userInfo)" )
-            }
+    func deleteAllQuotes() {
+        deleteAllData(for: ConversionEntity.self)
+    }
+    
+    func fetchQuotesEntities() -> [ConversionEntity] {
+        fetchEntities(ConversionEntity.self)
+    }
+}
+
+// MARK: - Currencies (Public)
+extension DataManager {
+    func syncCurrencies(_ currencies: [ListCurrenciesModel]) {
+        deleteAllCurrencies()
+        saveCurrencies(with: currencies)
+    }
+    
+    func hasDatabaseCurrencies() -> Bool {
+        !fetchCurrenciesEntities().isEmpty
+    }
+    
+    func fetchDatabaseCurrencies() -> [ListCurrenciesModel] {
+        fetchCurrenciesEntities().map {
+            ListCurrenciesModel(name: $0.name ?? "", code: $0.code ?? "")
         }
     }
 }
 
-// MARK: DatabaseListCurrencies
-extension DataManager {
-    func syncListCurrencies(currencies: [ListCurrenciesModel]) {
-        self.deleteAllData("CurrenciesEntity")
-        self.savingListCurrencies(with: currencies)
-    }
-    
-    func hasDatabaseListCurrencies() -> Bool {
-        let currenciesRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "CurrenciesEntity")
-        do {
-            let currenciesResult = try viewContext.fetch(currenciesRequest) as? [CurrenciesEntity]
-            if currenciesResult?.count ?? 0 > 0 {
-                return true
-            } else {
-                return false
-            }
-        } catch let error as NSError {
-            print("error \(error), \(error.userInfo)")
-            delegate?.didDataManagerFail(with: "\(error.userInfo)" )
-            return false
+// MARK: - Private / Currencies
+private extension DataManager {
+    func saveCurrencies(with currencies: [ListCurrenciesModel]) {
+        currencies.forEach { model in
+            let entity = CurrenciesEntity(context: context)
+            entity.code = model.code
+            entity.name = model.name
         }
+        saveContext()
     }
     
-    func fetchDatabaseListCurrencies() -> [ListCurrenciesModel]? {
-        var listCurrencies: [ListCurrenciesModel] = []
-        let currenciesEntity = NSFetchRequest<NSFetchRequestResult>(entityName: "CurrenciesEntity")
+    func deleteAllCurrencies() {
+        deleteAllData(for: CurrenciesEntity.self)
+    }
+    
+    func fetchCurrenciesEntities() -> [CurrenciesEntity] {
+        fetchEntities(CurrenciesEntity.self)
+    }
+}
+
+
+// MARK: - Shared Utilities
+private extension DataManager {
+    func deleteAllData<T: NSManagedObject>(for entityType: T.Type) {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: entityType))
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            let currenciesData = try viewContext.fetch(currenciesEntity) as? [CurrenciesEntity]
-            guard let objectData = currenciesData else { return nil }
-            
-            for data in objectData {
-                listCurrencies.append(
-                    ListCurrenciesModel(name: data.name ?? "", code: data.code ?? "")
-                )
-            }
-            return listCurrencies
+            try context.execute(deleteRequest)
         } catch {
-            return nil
+            delegate?.dataManager(didFailWith: .deletingFailed(error))
         }
     }
     
-    private func savingListCurrencies(with currencies: [ListCurrenciesModel]) {
-        if let currenciesEntity = NSEntityDescription.entity(forEntityName: "CurrenciesEntity", in: viewContext) {
-            
-            currencies.forEach { conversionQuotes in
-                
-                let conversion = NSManagedObject(entity: currenciesEntity, insertInto: viewContext)
-                conversion.setValue(conversionQuotes.code, forKeyPath: "code")
-                conversion.setValue(conversionQuotes.name, forKey: "name")
-                
-            }
-            do {
-                try viewContext.save()
-            } catch let error as NSError {
-                print("Could not save. \(error), \(error.userInfo)")
-                delegate?.didDataManagerFail(with: "\(error.userInfo)" )
-            }
+    func fetchEntities<T: NSManagedObject>(_ entityType: T.Type) -> [T] {
+        let request = NSFetchRequest<T>(entityName: String(describing: entityType))
+        do {
+            return try context.fetch(request)
+        } catch {
+            delegate?.dataManager(didFailWith: .fetchingFailed(error))
+            return []
+        }
+    }
+    
+    func saveContext() {
+        guard context.hasChanges else { return }
+        do {
+            try context.save()
+        } catch {
+            delegate?.dataManager(didFailWith: .savingFailed(error))
         }
     }
 }

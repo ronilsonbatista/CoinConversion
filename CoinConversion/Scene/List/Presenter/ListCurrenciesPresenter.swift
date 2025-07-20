@@ -117,7 +117,12 @@ extension ListCurrenciesPresenter: ListCurrenciesInteractorDelegate {
             )
             
             DispatchQueue.main.async {
-                self.dataManager?.syncListCurrencies(currencies: self.listCurrencies!)
+                guard let listCurrencies = self.listCurrencies else {
+                    // fazer tratamento
+                    return
+                }
+                
+                self.dataManager?.syncCurrencies(listCurrencies)
                 self.delegate?.didReloadData()
             }
         }
@@ -146,10 +151,11 @@ extension ListCurrenciesPresenter {
     }
     
     private func hasDatabaseListCurrencies() -> Bool {
-        if dataManager?.hasDatabaseListCurrencies() ?? false {
-            currencies = dataManager?.fetchDatabaseListCurrencies()
+        
+        if self.dataManager?.hasDatabaseCurrencies() ?? false {
+            currencies = dataManager?.fetchDatabaseCurrencies()
             listCurrencies = currencies
-            
+        
             guard var currencies = currencies,
                 let _ = listCurrencies else {
                     fatalError("provisorio fazer tratamento")
@@ -223,9 +229,9 @@ extension ListCurrenciesPresenter {
 
 // MARK: - DataManagerDelegate
 extension ListCurrenciesPresenter: DataManagerDelegate {
-    func didDataManagerFail(with reason: String) {
+    func dataManager(didFailWith error: PersistenceError) {
         delegate?.didFail(with: "Erro encontrado",
-                          message: "Desculpe-nos pelo erro. Não conseguimos salvar seus dados para uso off-line. \nMotivo: \(reason)",
+                          message: "Desculpe-nos pelo erro. Não conseguimos salvar seus dados para uso off-line. \nMotivo: \(error)",
             buttonTitle: "Continuar Navegando",
             noConnection: false,
             dataSave: false
