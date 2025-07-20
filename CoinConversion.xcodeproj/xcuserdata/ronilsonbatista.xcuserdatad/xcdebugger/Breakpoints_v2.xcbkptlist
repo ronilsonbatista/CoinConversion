@@ -82,64 +82,6 @@
             endingLineNumber = "14"
             landmarkName = "ConversionViewModel"
             landmarkType = "3">
-            <Locations>
-               <Location
-                  uuid = "A78E4351-D75B-4B2A-BFDB-FBF944E74E73 - 82ffe63f55339452"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "CoinConversion.ConversionViewModel.conversion.getter : Swift.Optional&lt;Swift.Array&lt;CoinConversion.ConversionCurrenciesViewModel&gt;&gt;"
-                  moduleName = "CoinConversion.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/ronilsonbatista/Desktop/CoinConversion/CoinConversion/Scene/Conversion/Entity/ConversionViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0">
-               </Location>
-               <Location
-                  uuid = "A78E4351-D75B-4B2A-BFDB-FBF944E74E73 - 82ffe63f55339452"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "CoinConversion.ConversionViewModel.conversion.setter : Swift.Optional&lt;Swift.Array&lt;CoinConversion.ConversionCurrenciesViewModel&gt;&gt;"
-                  moduleName = "CoinConversion.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/ronilsonbatista/Desktop/CoinConversion/CoinConversion/Scene/Conversion/Entity/ConversionViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0">
-               </Location>
-               <Location
-                  uuid = "A78E4351-D75B-4B2A-BFDB-FBF944E74E73 - d0511b1ae9c4e44a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "CoinConversion.ConversionViewModel.conversion.modify : Swift.Optional&lt;Swift.Array&lt;CoinConversion.ConversionCurrenciesViewModel&gt;&gt;"
-                  moduleName = "CoinConversion.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/ronilsonbatista/Desktop/CoinConversion/CoinConversion/Scene/Conversion/Entity/ConversionViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "14"
-                  endingLineNumber = "14">
-               </Location>
-               <Location
-                  uuid = "A78E4351-D75B-4B2A-BFDB-FBF944E74E73 - 95a6d06ca7b519f8"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "CoinConversion.ConversionViewModel.init(date: Swift.Double, conversion: Swift.Array&lt;CoinConversion.ConversionCurrenciesViewModel&gt;) -&gt; CoinConversion.ConversionViewModel"
-                  moduleName = "CoinConversion.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/ronilsonbatista/Desktop/CoinConversion/CoinConversion/Scene/Conversion/Entity/ConversionViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "14"
-                  endingLineNumber = "14">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

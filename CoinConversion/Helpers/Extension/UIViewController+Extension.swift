@@ -8,33 +8,46 @@
 
 import UIKit
 
+// MARK: - Variáveis globais (privadas)
 private var loadingView: UIView = UIView()
 private var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
 
+// MARK: - UIApplication helper
+extension UIApplication {
+    var keyWindow: UIWindow? {
+        connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+    }
+}
+
+// MARK: - UIViewController extensions
 extension UIViewController {
     class var nibName: String {
-        return String(describing: self)
+        String(describing: self)
     }
     
     func showActivityIndicator() {
-        if let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first {
-            loadingView.frame = window.frame
-            loadingView.center = window.center
-            loadingView.backgroundColor = UIColor(hexadecimal: 0x000000).withAlphaComponent(0.5)
-            loadingView.clipsToBounds = true
-            loadingView.alpha = 1
-            
-            activityIndicator.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
-            activityIndicator.style = .large
-            activityIndicator.center = CGPoint(x: loadingView.frame.size.width / 2, y: loadingView.frame.size.height / 2)
-            
-            DispatchQueue.main.async {
-                loadingView.addSubview(activityIndicator)
-                window.addSubview(loadingView)
-            }
-            
-            activityIndicator.startAnimating()
+        guard let window = UIApplication.shared.keyWindow else { return }
+        
+        loadingView.frame = window.bounds
+        loadingView.center = window.center
+        loadingView.backgroundColor = UIColor(hexadecimal: 0x000000).withAlphaComponent(0.5)
+        loadingView.clipsToBounds = true
+        loadingView.alpha = 1
+        
+        activityIndicator.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+        activityIndicator.style = .large
+        activityIndicator.center = CGPoint(x: loadingView.frame.size.width / 2,
+                                           y: loadingView.frame.size.height / 2)
+        
+        DispatchQueue.main.async {
+            loadingView.addSubview(activityIndicator)
+            window.addSubview(loadingView)
         }
+        
+        activityIndicator.startAnimating()
     }
     
     func hideActivityIndicator() {
@@ -55,13 +68,17 @@ extension UIViewController {
                                 title: String,
                                 preferredLargeTitle: Bool,
                                 isSearch: Bool,
-                                searchController: UISearchController?
-    ) {
+                                searchController: UISearchController? = nil) {
+        
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithOpaqueBackground()
-        navBarAppearance.largeTitleTextAttributes = [.foregroundColor:largeTitleColor,
-                                                     .font: UIFont.systemFont(ofSize: 25)]
-        navBarAppearance.titleTextAttributes = [.foregroundColor: largeTitleColor]
+        navBarAppearance.largeTitleTextAttributes = [
+            .foregroundColor: largeTitleColor,
+            .font: UIFont.systemFont(ofSize: 25)
+        ]
+        navBarAppearance.titleTextAttributes = [
+            .foregroundColor: largeTitleColor
+        ]
         navBarAppearance.backgroundColor = backgoundColor
         
         navigationController?.navigationBar.standardAppearance = navBarAppearance
@@ -71,10 +88,13 @@ extension UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = preferredLargeTitle
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.tintColor = tintColor
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "",
+                                                            style: .plain,
+                                                            target: nil,
+                                                            action: nil)
         navigationItem.title = title
         
-        if isSearch && searchController != nil {
+        if isSearch, let searchController {
             navigationItem.hidesSearchBarWhenScrolling = false
             navigationItem.searchController = searchController
             navigationController?.view.backgroundColor = .white
