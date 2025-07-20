@@ -10,7 +10,7 @@ import Foundation
 
 
 // MARK: - ListCurrenciesInteractorDelegate
-protocol ListCurrenciesInteractorDelegate: class {
+protocol ListCurrenciesInteractorDelegate: AnyObject {
     func currenciesFetched(with listCurrencies: ListCurrencies)
     func handleFailure(with serviceError: ServiceError)
 }

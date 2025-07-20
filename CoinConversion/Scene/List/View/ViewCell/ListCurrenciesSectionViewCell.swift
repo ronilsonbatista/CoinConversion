@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol ListCurrenciesSectionViewCellDelegate: class {
+protocol ListCurrenciesSectionViewCellDelegate: AnyObject {
     func didTapSortBy(_ sortType: SortType)
 }
 

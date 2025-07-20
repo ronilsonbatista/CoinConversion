@@ -15,7 +15,7 @@ enum SortType {
 }
 
 // MARK: - ListCurrenciesPresenterDelegate
-protocol ListCurrenciesPresenterDelegate: class {
+protocol ListCurrenciesPresenterDelegate: AnyObject {
     func didStartLoading()
     func didHideLoading()
     func didReloadData()

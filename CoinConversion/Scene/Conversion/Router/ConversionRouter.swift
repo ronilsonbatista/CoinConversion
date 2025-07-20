@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 // MARK: - ConversionRouterDelegate
-protocol ConversionRouterDelegate: class {
+protocol ConversionRouterDelegate: AnyObject {
     func currencyFetched(_ code: String, _ name: String, _ conversion: Conversion)
 }
 
