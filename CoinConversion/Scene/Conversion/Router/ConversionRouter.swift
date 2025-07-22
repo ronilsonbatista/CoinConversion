@@ -40,18 +40,20 @@ class ConversionRouter {
     }
     
     func enqueueListCurrencies(_ conversion: Conversion) {
-        let router = ListCurrenciesRouter()
-        router.delegate = self
-        
-        router.createListCurrenciesScreen(
-            conversion: conversion
+        let listCurrenciesViewController = ListCurrenciesModule.build(
+            conversion: conversion,
+            delegate: self
         )
+
+        if let topViewController = UIApplication.shared.topMostViewController() {
+            topViewController.navigationController?.pushViewController(listCurrenciesViewController, animated: true)
+        }
     }
 }
 
 // MARK: - ListCurrenciesRouterDelegate
 extension ConversionRouter: ListCurrenciesRouterDelegate {
-    func currencyFetched(_ code: String, _ name: String, _ conversion: Conversion) {
+    func currencyFetched(code: String, name: String, conversion: Conversion) {
         delegate?.currencyFetched(code, name, conversion)
     }
 }

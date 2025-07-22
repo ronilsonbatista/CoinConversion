@@ -8,12 +8,7 @@
 
 import Foundation
 
-class ListCurrenciesModel: NSObject {
-    var name = String()
-    var code = String()
-    
-    init(name: String, code: String) {
-        self.name = name
-        self.code = code
-    }
+struct ListCurrenciesModel {
+    let name: String
+    let code: String
 }

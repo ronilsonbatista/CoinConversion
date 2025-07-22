@@ -7,43 +7,47 @@
 //
 
 import Foundation
-import UIKit
 
-// MARK: - ConversionViewModelDelegate
+// MARK: - Router Protocol
+protocol ListCurrenciesRouting: AnyObject {
+    func dismissToConversion(code: String, name: String, conversion: Conversion)
+}
+
 protocol ListCurrenciesRouterDelegate: AnyObject {
-    func currencyFetched(_ code: String, _ name: String, _ conversion: Conversion)
+    func currencyFetched(code: String, name: String, conversion: Conversion)
 }
 
 // MARK: - Main
-class ListCurrenciesRouter {
+final class ListCurrenciesRouter: ListCurrenciesRouting {
     weak var delegate: ListCurrenciesRouterDelegate?
-    
-    func createListCurrenciesScreen(conversion: Conversion) {
-        let viewController = ListCurrenciesViewController(
-            presenter: ListCurrenciesPresenter(
-                interactor: ListCurrenciesInteractor(),
-                conversion: conversion,
-                dataManager: DataManager(),
-                router: self
-        ))
-        
-        if let topViewController = UIApplication.shared.topMostViewController() {
-            topViewController.navigationController?.pushViewController(
-                viewController, animated: true
-            )
-        }
+
+    init(delegate: ListCurrenciesRouterDelegate?) {
+        self.delegate = delegate
     }
     
-    func dismissToConversion(_ code: String, _ name: String, _ conversion: Conversion) {
-        delegate?.currencyFetched(
-            code,
-            name,
-            conversion
-        )
-        DispatchQueue.main.async(execute: {
-            if let topViewController = UIApplication.shared.topMostViewController() {
-                topViewController.navigationController?.popViewController(animated: true)
+//    func createListCurrenciesScreen(conversion: Conversion) {
+//        let viewController = ListCurrenciesViewController(
+//            presenter: ListCurrenciesPresenter(
+//                interactor: ListCurrenciesInteractor(),
+//                conversion: conversion,
+//                dataManager: DataManager(),
+//                router: self
+//        ))
+//        
+//        if let topViewController = UIApplication.shared.topMostViewController() {
+//            topViewController.navigationController?.pushViewController(
+//                viewController, animated: true
+//            )
+//        }
+//    }
+
+    func dismissToConversion(code: String, name: String, conversion: Conversion) {
+        delegate?.currencyFetched(code: code, name: name, conversion: conversion)
+
+        DispatchQueue.main.async {
+            if let topVC = UIApplication.shared.topMostViewController() {
+                topVC.navigationController?.popViewController(animated: true)
             }
-        })
+        }
     }
 }

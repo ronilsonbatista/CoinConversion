@@ -95,7 +95,7 @@ extension ListCurrenciesPresenter {
         guard let conversion = conversion else {
             fatalError("conversion type can't be nil")
         }
-        router?.dismissToConversion(code, name, conversion)
+        router?.dismissToConversion(code: code, name: name, conversion: conversion)
     }
 }
 
