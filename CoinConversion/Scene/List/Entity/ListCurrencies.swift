@@ -8,6 +8,7 @@
 
 import Foundation
 
+// MARK: - ListCurrencies
 struct ListCurrencies: Codable {
     
     let success: Bool

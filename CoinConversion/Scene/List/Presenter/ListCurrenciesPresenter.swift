@@ -8,10 +8,14 @@
 
 import Foundation
 
-// MARK: - SortType
-enum SortType {
-    case name
-    case code
+// MARK: - ListCurrenciesPresenting
+protocol ListCurrenciesPresenting: AnyObject {
+    var delegate: ListCurrenciesPresenterDelegate? { get set }
+    
+    func fetchListCurrencies(isRefresh: Bool)
+    func searchListCurrencies(with text: String)
+    func fetchListSorted(by type: SortType, currencies: [ListCurrenciesModel])
+    func chooseCurrency(code: String, name: String)
 }
 
 // MARK: - ListCurrenciesPresenterDelegate
@@ -19,83 +23,181 @@ protocol ListCurrenciesPresenterDelegate: AnyObject {
     func didStartLoading()
     func didHideLoading()
     func didReloadData()
-    func didFail(with title: String,
-                 message: String,
-                 buttonTitle: String,
-                 noConnection: Bool,
-                 dataSave: Bool
+    func didFail(
+        with title: String,
+        message: String,
+        buttonTitle: String,
+        noConnection: Bool,
+        dataSave: Bool
     )
 }
 
 // MARK: - Main
-class ListCurrenciesPresenter {
+final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
     weak var delegate: ListCurrenciesPresenterDelegate?
-    
-    private var interactor: ListCurrenciesInteractor?
-    private var conversion: Conversion?
-    private var router: ListCurrenciesRouter?
-    private var currencies: [ListCurrenciesModel]?
-    private var dataManager: DataManager?
-    
-    private(set) var listCurrencies: [ListCurrenciesModel]?
-    private(set) var isSort = Bool()
-    
-    init(interactor: ListCurrenciesInteractor,
-         conversion: Conversion,
-         dataManager: DataManager,
-         router: ListCurrenciesRouter
+
+    private var interactor: ListCurrenciesInteracting
+    private let router: ListCurrenciesRouting
+    private let dataManager: DataManager
+    private let conversion: Conversion
+
+    private var allCurrencies: [ListCurrenciesModel] = []
+    private(set) var listCurrencies: [ListCurrenciesModel] = []
+    private(set) var isSorted = false
+
+    // MARK: - Inicializador
+    init(
+        interactor: ListCurrenciesInteracting,
+        conversion: Conversion,
+        dataManager: DataManager,
+        router: ListCurrenciesRouting
     ) {
         self.interactor = interactor
-        self.interactor?.delegate = self
         self.conversion = conversion
         self.dataManager = dataManager
-        self.dataManager?.delegate = self
         self.router = router
-    }
-}
 
-// MARK: - PublicMethods
-extension ListCurrenciesPresenter {
-    func fetchListCurrencies(isRefresh: Bool) {
-        if !hasDatabaseListCurrencies() || isRefresh {
-            delegate?.didStartLoading()
-            isSort = false
-            interactor?.fetchListCurrencies()
-        }
+        self.interactor.delegate = self
+        self.dataManager.delegate = self
     }
     
-    func searchListCurrencies(whit text: String) {
-        if text.count > 0 {
-            var list = currencies
-            list = list?.filter {
-                $0.name.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(
-                    text.lowercased().folding(options: .diacriticInsensitive, locale: .current)
-                    ) ||
-                    $0.code.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(
-                        text.lowercased().folding(options: .diacriticInsensitive, locale: .current)
-                )
+    // MARK: - Métodos públicos
+    func fetchListCurrencies(isRefresh: Bool) {
+        if !loadFromDatabase() || isRefresh {
+            delegate?.didStartLoading()
+            isSorted = false
+            interactor.fetchListCurrencies()
+        }
+    }
+
+    func searchListCurrencies(with text: String) {
+        if text.isEmpty {
+            listCurrencies = allCurrencies
+        } else {
+            listCurrencies = allCurrencies.filter {
+                $0.name.localizedCaseInsensitiveContains(text) ||
+                $0.code.localizedCaseInsensitiveContains(text)
             }
-            listCurrencies = list
-            delegate?.didReloadData()
-            return
         }
         
-        listCurrencies = currencies
-        isSort = false
-        delegate?.didReloadData()
-    }
-    
-    func fetchLisSortBy(_ type: SortType, with list: [ListCurrenciesModel]) {
-        self.listCurrencies = sortBy(type: type, with: list)
-        isSort = true
-        delegate?.didReloadData()
-    }
-    
-    func chosenCurrencies(code: String, name: String) {
-        guard let conversion = conversion else {
-            fatalError("conversion type can't be nil")
+        DispatchQueue.main.async {
+            self.delegate?.didReloadData()
         }
-        router?.dismissToConversion(code: code, name: name, conversion: conversion)
+    }
+
+    func fetchListSorted(by type: SortType, currencies: [ListCurrenciesModel]) {
+        switch type {
+        case .name:
+            listCurrencies = currencies.sorted { $0.name < $1.name }
+        case .code:
+            listCurrencies = currencies.sorted { $0.code < $1.code }
+        }
+        isSorted = true
+        
+        DispatchQueue.main.async {
+            self.delegate?.didReloadData()
+        }
+    }
+
+    func chooseCurrency(code: String, name: String) {
+        router.dismissToConversion(code: code, name: name, conversion: conversion)
+    }
+
+    // MARK: - Métodos privados
+    private func loadFromDatabase() -> Bool {
+        guard dataManager.hasDatabaseCurrencies() else {
+            return false
+        }
+
+        let currencies = dataManager.fetchDatabaseCurrencies()
+            .sorted(by: { $0.name < $1.name })
+
+        allCurrencies = currencies
+        listCurrencies = currencies
+        isSorted = false
+
+        return true
+    }
+
+    private func handleListCurrencies(_ listCurrencies: ListCurrencies) -> [ListCurrenciesModel] {
+        return listCurrencies.currencies
+            .map { ListCurrenciesModel(name: $0.value, code: $0.key) }
+            .sorted { $0.name < $1.name }
+    }
+
+    private func handleError(_ error: ServiceError) {
+        delegate?.didHideLoading()
+
+        let hasLocalData = loadFromDatabase()
+
+        if error.type == .noConnection {
+            if hasLocalData {
+                showError(
+                    title: "Problema na conexão",
+                    message: """
+                        Encontramos problemas com a conexão.
+                        Não conseguimos atualizar as cotas. Continue navegando com os dados da última atualização.
+                    """,
+                    buttonTitle: "OK",
+                    noConnection: true,
+                    dataSave: true
+                )
+                return
+            }
+
+            showError(
+                title: "Problema na conexão",
+                message: """
+                    Encontramos problemas com a conexão.
+                    Tente ajustá-la para continuar navegando.
+                """,
+                buttonTitle: "Tentar novamente",
+                noConnection: true,
+                dataSave: false
+            )
+            return
+        }
+
+        if hasLocalData {
+            showError(
+                title: "Erro encontrado",
+                message: """
+                    Desculpe-nos pelo erro.
+                    Não conseguimos atualizar as cotas. Continue navegando com os dados da última atualização.
+                """,
+                buttonTitle: "OK",
+                noConnection: false,
+                dataSave: false
+            )
+            return
+        }
+
+        showError(
+            title: "Erro encontrado",
+            message: """
+                Desculpe-nos pelo erro. Iremos contorná-lo o mais rápido possível.
+                Motivo: \(error.type.description)
+            """,
+            buttonTitle: "OK",
+            noConnection: false,
+            dataSave: false
+        )
+    }
+
+    private func showError(
+        title: String,
+        message: String,
+        buttonTitle: String,
+        noConnection: Bool,
+        dataSave: Bool
+    ) {
+        delegate?.didFail(
+            with: title,
+            message: message,
+            buttonTitle: buttonTitle,
+            noConnection: noConnection,
+            dataSave: dataSave
+        )
     }
 }
 
@@ -103,139 +205,40 @@ extension ListCurrenciesPresenter {
 extension ListCurrenciesPresenter: ListCurrenciesInteractorDelegate {
     func currenciesFetched(with listCurrencies: ListCurrencies) {
         delegate?.didHideLoading()
-        
-        switch listCurrencies.success {
-        case false:
-            self.handleError(whit: .init(type: .noAuthorized))
-            return
-        default:
-            self.currencies = self.handleListCurrencies(
-                with: listCurrencies
-            )
-            self.listCurrencies = self.handleListCurrencies(
-                with: listCurrencies
-            )
-            
-            DispatchQueue.main.async {
-                guard let listCurrencies = self.listCurrencies else {
-                    // fazer tratamento
-                    return
-                }
-                
-                self.dataManager?.syncCurrencies(listCurrencies)
-                self.delegate?.didReloadData()
-            }
-        }
-    }
-    
-    func handleFailure(with serviceError: ServiceError) {
-        delegate?.didHideLoading()
-        handleError(whit: serviceError)
-    }
-}
 
-// MARK: - PrivateMethods
-extension ListCurrenciesPresenter {
-    private func handleListCurrencies(with listCurrencies: ListCurrencies) -> [ListCurrenciesModel] {
-        var list = listCurrencies.currencies.map { list -> ListCurrenciesModel in
-            return ListCurrenciesModel(
-                name: list.value, code: list.key
-            )
-        }
-        
-        list = list.sorted {
-            $0.name < $1.name
-        }
-        
-        return list
-    }
-    
-    private func hasDatabaseListCurrencies() -> Bool {
-        
-        if self.dataManager?.hasDatabaseCurrencies() ?? false {
-            currencies = dataManager?.fetchDatabaseCurrencies()
-            listCurrencies = currencies
-        
-            guard var currencies = currencies,
-                let _ = listCurrencies else {
-                    fatalError("provisorio fazer tratamento")
-            }
-            
-            currencies = currencies.sorted {
-                $0.name < $1.name
-            }
-            
-            self.listCurrencies = currencies
-            self.currencies = currencies
-            isSort = false
-            
-            return true
-        }
-        return false
-    }
-    
-    func sortBy(type: SortType, with list: [ListCurrenciesModel]) -> [ListCurrenciesModel] {
-        switch type {
-        case .code:
-            return list.sorted {
-                $0.code < $1.code
-            }
-        case .name:
-            return list.sorted {
-                $0.name < $1.name
-            }
-        }
-    }
-    
-    private func handleError(whit error: ServiceError) {
-        guard error.type == .noConnection else {
-            guard hasDatabaseListCurrencies() else {
-                delegate?.didFail(with: "Erro encontrado",
-                                  message: "Desculpe-nos pelo erro. Iremos contorná-lo o mais rápido possível. \nMotivo: \(error.type.description)",
-                    buttonTitle: "OK",
-                    noConnection: false,
-                    dataSave: false
-                )
-                
-                return
-            }
-            
-            delegate?.didFail(with: "Erro encontrado",
-                              message: "Desculpe-nos pelo erro. \nNão conseguimos atualizar as cotas continue navegando com os dados da última atualização.",
-                              buttonTitle: "OK",
-                              noConnection: false,
-                              dataSave: false
-            )
+        guard listCurrencies.success else {
+            handleError(.init(type: .noAuthorized))
             return
         }
+
+        let parsed = handleListCurrencies(listCurrencies)
+        allCurrencies = parsed
+        self.listCurrencies = parsed
+        dataManager.syncCurrencies(parsed)
         
-        if hasDatabaseListCurrencies() {
-            delegate?.didFail(with: "Problema na conexão",
-                              message: "Encontramos problemas com a conexão. \nNão conseguimos atualizar as cotas continue navegando com os dados da última atualização.",
-                              buttonTitle: "OK",
-                              noConnection: true,
-                              dataSave: true
-            )
-            return
+        DispatchQueue.main.async {
+            self.delegate?.didReloadData()
         }
-        delegate?.didFail(with: "Problema na conexão",
-                          message: "Encontramos problemas com a conexão. Tente ajustá-la para continuar navegando.",
-                          buttonTitle: "Tentar novamente",
-                          noConnection: true,
-                          dataSave: false
-        )
+    }
+
+    func handleFailure(with serviceError: ServiceError) {
+        handleError(serviceError)
     }
 }
 
 // MARK: - DataManagerDelegate
 extension ListCurrenciesPresenter: DataManagerDelegate {
     func dataManager(didFailWith error: PersistenceError) {
-        delegate?.didFail(with: "Erro encontrado",
-                          message: "Desculpe-nos pelo erro. Não conseguimos salvar seus dados para uso off-line. \nMotivo: \(error)",
-            buttonTitle: "Continuar Navegando",
+        delegate?.didFail(
+            with: "Erro ao salvar dados",
+            message: """
+                Desculpe-nos pelo erro.
+                Não conseguimos salvar seus dados para uso off-line.
+                Motivo: \(error)
+            """,
+            buttonTitle: "Continuar",
             noConnection: false,
             dataSave: false
         )
     }
 }
-

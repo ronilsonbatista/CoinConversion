@@ -11,14 +11,14 @@ import UIKit
 // MARK: - Main
 class ListCurrenciesViewController: UITableViewController {
     
-    var presenter: ListCurrenciesPresenter?
+    var presenter: ListCurrenciesPresenting
     private let searchController = UISearchController(searchResultsController: nil)
     
-    init(presenter: ListCurrenciesPresenter) {
+    init(presenter: ListCurrenciesPresenting) {
         self.presenter = presenter
-        super.init(nibName: ListCurrenciesViewController.nibName, bundle: nil)
+        super.init(style: .plain)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -34,8 +34,8 @@ extension ListCurrenciesViewController {
         setupBarButton()
         registerTableView()
         
-        presenter?.delegate = self
-        presenter?.fetchListCurrencies(isRefresh: false)
+        presenter.delegate = self
+        presenter.fetchListCurrencies(isRefresh: false)
     }
 }
 
@@ -63,11 +63,11 @@ extension ListCurrenciesViewController {
     }
     
     @objc private func refreshButtonTouched(sender: UIBarButtonItem) {
-        presenter?.fetchListCurrencies(isRefresh: true)
+        presenter.fetchListCurrencies(isRefresh: true)
     }
     
     private func doLoading(action: UIAlertAction) {
-        presenter?.fetchListCurrencies(isRefresh: true)
+        presenter.fetchListCurrencies(isRefresh: true)
     }
     
     private func setupSearchController() -> UISearchController {
@@ -108,11 +108,11 @@ extension ListCurrenciesViewController {
 extension ListCurrenciesViewController: UISearchResultsUpdating, UISearchControllerDelegate {
     func updateSearchResults(for searchController: UISearchController) {
         if let text = searchController.searchBar.text, !text.isEmpty {
-            presenter?.searchListCurrencies(whit: text)
+            presenter?.searchListCurrencies(with: text)
         }
         
         if let text = searchController.searchBar.text, text.isEmpty {
-            presenter?.searchListCurrencies(whit: "")
+            presenter?.searchListCurrencies(with: "")
         }
     }
 }
@@ -136,7 +136,7 @@ extension ListCurrenciesViewController {
             fatalError("Couldn't dequeue \(ListCurrenciesSectionViewCell.identifier)")
         }
         
-        if !(presenter?.isSort ?? false) {
+        if !(presenter?.isSorted ?? false) {
             cell.setupRadioButtons(tag: 0, buttons: cell.sortByNameButton)
         }
         
@@ -185,7 +185,7 @@ extension ListCurrenciesViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let currencies = listCurrencies[indexPath.row]
-            self.presenter?.chosenCurrencies(code: currencies.code, name: currencies.name)
+            self.presenter?.chooseCurrency(code:currencies.code, name: currencies.name)
         }
     }
 }
@@ -197,10 +197,7 @@ extension ListCurrenciesViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if presenter?.listCurrencies?.count == 0 {
-            return 230
-        }
-        return 100
+        return presenter.listCurrencies.isEmpty ? 230 : 100
     }
 }
 
@@ -211,8 +208,7 @@ extension ListCurrenciesViewController: ListCurrenciesSectionViewCellDelegate {
         guard let listCurrencies = presenter?.listCurrencies else {
             fatalError("listCurrencies cannot be null")
         }
-        
-        presenter?.fetchLisSortBy(sortType, with: listCurrencies)
+        presenter?.fetchListSorted(by: sortType, currencies: presenter.listCurrencies)
     }
 }
 

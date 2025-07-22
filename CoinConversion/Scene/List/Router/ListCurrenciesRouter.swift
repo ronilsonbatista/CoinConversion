@@ -25,22 +25,6 @@ final class ListCurrenciesRouter: ListCurrenciesRouting {
         self.delegate = delegate
     }
     
-//    func createListCurrenciesScreen(conversion: Conversion) {
-//        let viewController = ListCurrenciesViewController(
-//            presenter: ListCurrenciesPresenter(
-//                interactor: ListCurrenciesInteractor(),
-//                conversion: conversion,
-//                dataManager: DataManager(),
-//                router: self
-//        ))
-//        
-//        if let topViewController = UIApplication.shared.topMostViewController() {
-//            topViewController.navigationController?.pushViewController(
-//                viewController, animated: true
-//            )
-//        }
-//    }
-
     func dismissToConversion(code: String, name: String, conversion: Conversion) {
         delegate?.currencyFetched(code: code, name: name, conversion: conversion)
 
