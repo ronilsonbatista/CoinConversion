@@ -33,7 +33,7 @@ class ListCurrenciesInteractor: ListCurrenciesInteracting {
         ServiceRequest.shared.request(method: .get, url: serviceUrl, parameters: parameters, encoding: .default, success: { result in
             self.handleSuccess(result)
         }, failure: { serviceError  in
-           self.delegate?.handleFailure(with: serviceError)
+            self.delegate?.handleFailure(with: serviceError)
         })
     }
     

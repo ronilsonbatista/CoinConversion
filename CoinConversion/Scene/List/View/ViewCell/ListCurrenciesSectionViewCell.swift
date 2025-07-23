@@ -22,7 +22,7 @@ class ListCurrenciesSectionViewCell: UITableViewHeaderFooterView {
         let label = UILabel()
         label.text = "Ordenar por:"
         label.textColor = .colorGrayPrimary
-        label.font = .systemFont(ofSize: 17, weight: .medium)
+        label.font = .systemFont(ofSize: 20, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -30,8 +30,8 @@ class ListCurrenciesSectionViewCell: UITableViewHeaderFooterView {
     let sortByNameButton: RadioButton = {
         let button = RadioButton()
         button.setTitle("Nome", for: .normal)
-        button.setTitleColor(.colorGrayLighten60, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16)
+        button.setTitleColor(.colorSectionLabelk, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 18)
         button.iconColor = .colorGrayLighten60
         button.indicatorColor = .colorDarkishPink
         button.iconBackgroundColor = .colorGrayLighten70
@@ -43,8 +43,8 @@ class ListCurrenciesSectionViewCell: UITableViewHeaderFooterView {
     private let sortByCodeButton: RadioButton = {
         let button = RadioButton()
         button.setTitle("Código", for: .normal)
-        button.setTitleColor(.colorGrayLighten60, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16)
+        button.setTitleColor(.colorSectionLabelk, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 18)
         button.iconColor = .colorGrayLighten60
         button.indicatorColor = .colorDarkishPink
         button.iconBackgroundColor = .colorGrayLighten70

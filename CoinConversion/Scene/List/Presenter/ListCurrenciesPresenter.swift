@@ -37,16 +37,16 @@ protocol ListCurrenciesPresenterDelegate: AnyObject {
 // MARK: - Main
 final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
     weak var delegate: ListCurrenciesPresenterDelegate?
-
+    
     private var interactor: ListCurrenciesInteracting
     private let router: ListCurrenciesRouting
     private let dataManager: DataManager
     private let conversion: Conversion
-
+    
     private var allCurrencies: [ListCurrenciesModel] = []
     private(set) var listCurrencies: [ListCurrenciesModel] = []
     private(set) var isSorted = false
-
+    
     // MARK: - Inicializador
     init(
         interactor: ListCurrenciesInteracting,
@@ -58,7 +58,7 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
         self.conversion = conversion
         self.dataManager = dataManager
         self.router = router
-
+        
         self.interactor.delegate = self
         self.dataManager.delegate = self
     }
@@ -71,7 +71,7 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
             interactor.fetchListCurrencies()
         }
     }
-
+    
     func searchListCurrencies(with text: String) {
         if text.isEmpty {
             listCurrencies = allCurrencies
@@ -86,7 +86,7 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
             self.delegate?.didReloadData()
         }
     }
-
+    
     func fetchListSorted(by type: SortType, currencies: [ListCurrenciesModel]) {
         switch type {
         case .name:
@@ -100,38 +100,38 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
             self.delegate?.didReloadData()
         }
     }
-
+    
     func chooseCurrency(code: String, name: String) {
         router.dismissToConversion(code: code, name: name, conversion: conversion)
     }
-
+    
     // MARK: - Métodos privados
     private func loadFromDatabase() -> Bool {
         guard dataManager.hasDatabaseCurrencies() else {
             return false
         }
-
+        
         let currencies = dataManager.fetchDatabaseCurrencies()
             .sorted(by: { $0.name < $1.name })
-
+        
         allCurrencies = currencies
         listCurrencies = currencies
         isSorted = false
-
+        
         return true
     }
-
+    
     private func handleListCurrencies(_ listCurrencies: ListCurrencies) -> [ListCurrenciesModel] {
         return listCurrencies.currencies
             .map { ListCurrenciesModel(name: $0.value, code: $0.key) }
             .sorted { $0.name < $1.name }
     }
-
+    
     private func handleError(_ error: ServiceError) {
         delegate?.didHideLoading()
-
+        
         let hasLocalData = loadFromDatabase()
-
+        
         if error.type == .noConnection {
             if hasLocalData {
                 showError(
@@ -146,7 +146,7 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
                 )
                 return
             }
-
+            
             showError(
                 title: "Problema na conexão",
                 message: """
@@ -159,7 +159,7 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
             )
             return
         }
-
+        
         if hasLocalData {
             showError(
                 title: "Erro encontrado",
@@ -173,7 +173,7 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
             )
             return
         }
-
+        
         showError(
             title: "Erro encontrado",
             message: """
@@ -185,7 +185,7 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
             dataSave: false
         )
     }
-
+    
     private func showError(
         title: String,
         message: String,
@@ -207,12 +207,12 @@ final class ListCurrenciesPresenter:  ListCurrenciesPresenting {
 extension ListCurrenciesPresenter: ListCurrenciesInteractorDelegate {
     func currenciesFetched(with listCurrencies: ListCurrencies) {
         delegate?.didHideLoading()
-
+        
         guard listCurrencies.success else {
             handleError(.init(type: .noAuthorized))
             return
         }
-
+        
         let parsed = handleListCurrencies(listCurrencies)
         allCurrencies = parsed
         self.listCurrencies = parsed
@@ -222,7 +222,7 @@ extension ListCurrenciesPresenter: ListCurrenciesInteractorDelegate {
             self.delegate?.didReloadData()
         }
     }
-
+    
     func handleFailure(with serviceError: ServiceError) {
         handleError(serviceError)
     }

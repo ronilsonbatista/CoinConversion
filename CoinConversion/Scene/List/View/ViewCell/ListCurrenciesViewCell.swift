@@ -16,7 +16,6 @@ class ListCurrenciesViewCell: UITableViewCell {
     private let containerView: UIView = {
         let view = UIView()
         view.setCardLayout()
-        view.backgroundColor = .colorDarkishPink // no código original, o fundo do container era custom
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()

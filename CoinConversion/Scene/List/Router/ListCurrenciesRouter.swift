@@ -20,14 +20,14 @@ protocol ListCurrenciesRouterDelegate: AnyObject {
 // MARK: - Main
 final class ListCurrenciesRouter: ListCurrenciesRouting {
     weak var delegate: ListCurrenciesRouterDelegate?
-
+    
     init(delegate: ListCurrenciesRouterDelegate?) {
         self.delegate = delegate
     }
     
     func dismissToConversion(code: String, name: String, conversion: Conversion) {
         delegate?.currencyFetched(code: code, name: name, conversion: conversion)
-
+        
         DispatchQueue.main.async {
             if let topVC = UIApplication.shared.topMostViewController() {
                 topVC.navigationController?.popViewController(animated: true)

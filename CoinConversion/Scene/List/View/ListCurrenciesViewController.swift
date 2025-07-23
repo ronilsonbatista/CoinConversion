@@ -18,7 +18,7 @@ class ListCurrenciesViewController: UITableViewController {
         self.presenter = presenter
         super.init(style: .plain)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -51,7 +51,7 @@ extension ListCurrenciesViewController {
         tableView.clearsContextBeforeDrawing = false
         tableView.dataSource = self
         tableView.delegate = self
-
+        
         registerTableViewCells()
     }
     
@@ -159,9 +159,9 @@ extension ListCurrenciesViewController {
         
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: ListCurrenciesViewCell.identifier, for: indexPath)
-            as? ListCurrenciesViewCell else {
-                
-                fatalError("Couldn't dequeue \(ListCurrenciesViewCell.identifier)")
+                as? ListCurrenciesViewCell else {
+            
+            fatalError("Couldn't dequeue \(ListCurrenciesViewCell.identifier)")
         }
         
         let currencies = presenter.listCurrencies[indexPath.row]
@@ -210,10 +210,7 @@ extension ListCurrenciesViewController: ListCurrenciesPresenterDelegate {
     }
     
     func didReloadData() {
-        UIView.transition(with: self.tableView, duration: 0.35, options: .transitionCrossDissolve, animations: {
-            self.tableView.reloadData()
-            self.tableView.scrollToRow(at: IndexPath(row: NSNotFound, section: 0), at: .top, animated: true)
-        })
+        self.tableView.reloadData()
     }
     
     func didFail(with title: String, message: String, buttonTitle: String, noConnection: Bool, dataSave: Bool) {
