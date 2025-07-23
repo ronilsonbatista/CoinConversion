@@ -11,6 +11,8 @@ import Foundation
 // MARK: - ListCurrenciesPresenting
 protocol ListCurrenciesPresenting: AnyObject {
     var delegate: ListCurrenciesPresenterDelegate? { get set }
+    var listCurrencies: [ListCurrenciesModel] { get }
+    var isSorted: Bool { get }
     
     func fetchListCurrencies(isRefresh: Bool)
     func searchListCurrencies(with text: String)

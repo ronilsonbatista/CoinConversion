@@ -14,47 +14,104 @@ protocol ListCurrenciesSectionViewCellDelegate: AnyObject {
 
 // MARK: - Main
 class ListCurrenciesSectionViewCell: UITableViewHeaderFooterView {
-    @IBOutlet weak var sortByNameButton: RadioButton! {
-        didSet {
-            sortByNameButton.iconColor = .colorGrayLighten60
-            sortByNameButton.indicatorColor = .colorDarkishPink
-            sortByNameButton.iconBackgroundColor = .colorGrayLighten70
-        }
-    }
-    
-    @IBOutlet private weak var sortByCodeButton: RadioButton! {
-        didSet {
-            sortByCodeButton.iconColor = .colorGrayLighten60
-            sortByCodeButton.indicatorColor = .colorDarkishPink
-            sortByCodeButton.iconBackgroundColor = .colorGrayLighten70
-        }
-    }
-    
-    @IBAction private func didTapSortByNameButton(_ sender: RadioButton) {
-        setupRadioButtons(tag: 0, buttons: sortByNameButton)
-        delegate?.didTapSortBy(.name)
-    }
-    
-    @IBAction private func didTapSortByCodeButton(_ sender: RadioButton) {
-        setupRadioButtons(tag: 1, buttons: sortByNameButton)
-        delegate?.didTapSortBy(.code)
-    }
+    static let identifier = "ListCurrenciesSectionViewCell"
     
     weak var delegate: ListCurrenciesSectionViewCellDelegate?
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        contentView.backgroundColor = .colorBackground
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ordenar por:"
+        label.textColor = .colorGrayPrimary
+        label.font = .systemFont(ofSize: 17, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    let sortByNameButton: RadioButton = {
+        let button = RadioButton()
+        button.setTitle("Nome", for: .normal)
+        button.setTitleColor(.colorGrayLighten60, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16)
+        button.iconColor = .colorGrayLighten60
+        button.indicatorColor = .colorDarkishPink
+        button.iconBackgroundColor = .colorGrayLighten70
+        button.tag = 0
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let sortByCodeButton: RadioButton = {
+        let button = RadioButton()
+        button.setTitle("Código", for: .normal)
+        button.setTitleColor(.colorGrayLighten60, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16)
+        button.iconColor = .colorGrayLighten60
+        button.indicatorColor = .colorDarkishPink
+        button.iconBackgroundColor = .colorGrayLighten70
+        button.tag = 1
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    // MARK: - Init
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
+        configureView()
     }
-}
-
-// MARK: - Radio buttons
-extension ListCurrenciesSectionViewCell {
-    func setupRadioButtons(tag: Int, buttons: RadioButton) {
-        buttons.isMultipleSelectionEnabled = false
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Setup
+    private func configureView() {
+        contentView.backgroundColor = .colorBackground
         
-        buttons.allButtons().forEach { button in
-            button.isSelected = tag == button.tag
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(sortByNameButton)
+        contentView.addSubview(sortByCodeButton)
+        
+        sortByNameButton.addTarget(self, action: #selector(didTapSortByName), for: .touchUpInside)
+        sortByCodeButton.addTarget(self, action: #selector(didTapSortByCode), for: .touchUpInside)
+        
+        NSLayoutConstraint.activate([
+            // titleLabel
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 21),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -21),
+            
+            // sortByNameButton
+            sortByNameButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            sortByNameButton.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            sortByNameButton.widthAnchor.constraint(equalToConstant: 80),
+            sortByNameButton.heightAnchor.constraint(equalToConstant: 20),
+            
+            // sortByCodeButton
+            sortByCodeButton.topAnchor.constraint(equalTo: sortByNameButton.topAnchor),
+            sortByCodeButton.leadingAnchor.constraint(equalTo: sortByNameButton.trailingAnchor, constant: 40),
+            sortByCodeButton.widthAnchor.constraint(equalToConstant: 86),
+            sortByCodeButton.heightAnchor.constraint(equalTo: sortByNameButton.heightAnchor),
+            
+            // alinhamento inferior (opcional, como no XIB)
+            sortByNameButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16.5)
+        ])
+    }
+    
+    // MARK: - Actions
+    @objc private func didTapSortByName() {
+        setupRadioButtons(selectedTag: 0)
+        delegate?.didTapSortBy(.name)
+    }
+    
+    @objc private func didTapSortByCode() {
+        setupRadioButtons(selectedTag: 1)
+        delegate?.didTapSortBy(.code)
+    }
+    
+    // MARK: - Helpers
+    func setupRadioButtons(selectedTag: Int) {
+        [sortByNameButton, sortByCodeButton].forEach { button in
+            button.isSelected = (button.tag == selectedTag)
         }
     }
 }
