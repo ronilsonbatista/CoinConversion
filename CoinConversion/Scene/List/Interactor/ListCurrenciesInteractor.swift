@@ -32,11 +32,17 @@ class ListCurrenciesInteractor: ListCurrenciesInteracting {
         
         let parameters = ["access_key": "33c0ee51ffd7880ce2b4d1f9e36799ea"] as [String: Any]
         
-        ServiceRequest.shared.request(method: .get, url: serviceUrl, parameters: parameters, encoding: .default, success: { result in
-            self.handleSuccess(result)
-        }, failure: { serviceError  in
-            self.delegate?.handleFailure(with: serviceError)
-        })
+        ServiceRequest.shared.request(
+            method: .get,
+            url: serviceUrl,
+            parameters: parameters,
+            encoding: .default,
+            success: { result in
+                
+                self.handleSuccess(result)
+            }, failure: { serviceError  in
+                self.delegate?.handleFailure(with: serviceError)
+            })
     }
     
     private func handleSuccess(_ data: Data) {

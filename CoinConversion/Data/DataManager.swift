@@ -43,20 +43,20 @@ extension DataManager {
         guard let first = entities.first else { return nil }
         
         let conversions = entities.map {
-            ConversionCurrenciesViewModel(code: $0.code ?? "", quotes: $0.quotes)
+            ConversionCurrencyViewModel(code: $0.code ?? "", quotes: $0.quotes)
         }
-        return ConversionViewModel(date: first.timestamp, conversion: conversions)
+        return ConversionViewModel(date: first.timestamp, currencies: conversions)
     }
 }
 
 // MARK: - Private / Quotes
 private extension DataManager {
     func saveQuotes(with viewModel: ConversionViewModel) {
-        viewModel.conversion?.forEach { quoteVM in
+        viewModel.currencies.forEach { quoteVM in
             let entity = ConversionEntity(context: context)
             entity.code = quoteVM.code
-            entity.quotes = quoteVM.quotes ?? 0.0
-            entity.timestamp = viewModel.date ?? 0
+            entity.quotes = quoteVM.quotes
+            entity.timestamp = viewModel.date
         }
         saveContext()
     }

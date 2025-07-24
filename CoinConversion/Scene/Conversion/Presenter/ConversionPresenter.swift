@@ -67,7 +67,7 @@ extension ConversionPresenter {
             fromCode: fromCode,
             toCode: toCode,
             value: value,
-            conversion: conversionModel?.conversion
+            conversion: conversionModel?.currencies
         )
         guard convert == nil else {
             delegate?.didReloadResult(
@@ -80,7 +80,7 @@ extension ConversionPresenter {
     }
     
     func fetchCurrencies(_ conversion: Conversion) {
-        router?.enqueueListCurrencies(conversion)
+        router?.navigateToListCurrencies(using: conversion)
     }
 }
 
@@ -88,15 +88,15 @@ extension ConversionPresenter {
 extension ConversionPresenter {
     private func handleQuotes(with quotes: CurrenciesConversion) -> ConversionViewModel {
         let currencies = quotes.quotes.map {
-            currencies -> ConversionCurrenciesViewModel in
+            currencies -> ConversionCurrencyViewModel in
             
-            return ConversionCurrenciesViewModel(
+            return ConversionCurrencyViewModel(
                 code: currencies.key,
                 quotes: currencies.value
             )
         }
         
-        return ConversionViewModel(date: quotes.timestamp, conversion: currencies)
+        return ConversionViewModel(date: quotes.timestamp, currencies: currencies)
     }
     
     private func findLocaleBy(whit currencyCode: String) -> Locale? {
@@ -116,7 +116,7 @@ extension ConversionPresenter {
         return locale
     }
     
-    private func convertCurrency(fromCode: String,toCode: String, value: String, conversion: [ConversionCurrenciesViewModel]?) -> String? {
+    private func convertCurrency(fromCode: String,toCode: String, value: String, conversion: [ConversionCurrencyViewModel]?) -> String? {
         let currencyBase = "USD"
         
         guard let conversion = conversion else {
@@ -128,12 +128,10 @@ extension ConversionPresenter {
         guard let fetchToQuotes = returnQuotes(conversion: conversion, currencyBase: currencyBase, code: toCode) else {
             return nil
         }
-        guard let toQuotes = fetchToQuotes.quotes, let fromQuotes = fetchFromQuotes.quotes else {
-            return nil
-        }
+
         
         if let value = Double(value) {
-            let calculate = calculateConversion(value: value, toQuotes: toQuotes, fromQuotes: fromQuotes)
+            let calculate = calculateConversion(value: value, toQuotes: fetchToQuotes.quotes, fromQuotes: fetchFromQuotes.quotes)
             
             guard let result = formatCurrency(currencyCode: toCode, amount: String(calculate)) else {
                 return nil
@@ -155,7 +153,7 @@ extension ConversionPresenter {
                 fatalError("provisorio fazer tratamento")
             }
             delegate?.didUpdateDate(
-                with: conversion.date?.getDateStringFromUTC() ?? "-"
+                with: conversion.date.getDateStringFromUTC() 
             )
             return true
         }
@@ -227,7 +225,7 @@ extension ConversionPresenter {
         return result
     }
     
-    func returnQuotes(conversion: [ConversionCurrenciesViewModel], currencyBase: String, code: String) -> ConversionCurrenciesViewModel? {
+    func returnQuotes(conversion: [ConversionCurrencyViewModel], currencyBase: String, code: String) -> ConversionCurrencyViewModel? {
         if let quotes = conversion.first(
             where: { $0.code == currencyBase + code }
             ) {
@@ -259,7 +257,7 @@ extension ConversionPresenter: CurrenciesConversionInteractorDelegate {
             )
             
             self.delegate?.didUpdateDate(
-                with: conversionModel?.date?.getDateStringFromUTC() ?? "-"
+                with: conversionModel?.date.getDateStringFromUTC() ?? "-"
             )
             
             dataManager?.syncQuotes(with: conversionModel!)

@@ -27,6 +27,7 @@
 		D1A4AED72E2DA9650075616D /* ListCurrenciesModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A4AED62E2DA9640075616D /* ListCurrenciesModule.swift */; };
 		D1A7E0D524C613F200A71E91 /* ListCurrenciesViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A7E0D324C613F200A71E91 /* ListCurrenciesViewCell.swift */; };
 		D1A7E0D824C6201F00A71E91 /* ListCurrenciesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A7E0D724C6201F00A71E91 /* ListCurrenciesModel.swift */; };
+		D1C7B4A42E32D63000AAB818 /* ConversionModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C7B4A32E32D62D00AAB818 /* ConversionModule.swift */; };
 		D1C92B6424C3B77D0049E64B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B6324C3B77D0049E64B /* AppDelegate.swift */; };
 		D1C92B6624C3B77D0049E64B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C92B6524C3B77D0049E64B /* SceneDelegate.swift */; };
 		D1C92B6D24C3B77F0049E64B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1C92B6C24C3B77F0049E64B /* Assets.xcassets */; };
@@ -100,6 +101,7 @@
 		D1A4AED62E2DA9640075616D /* ListCurrenciesModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesModule.swift; sourceTree = "<group>"; };
 		D1A7E0D324C613F200A71E91 /* ListCurrenciesViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesViewCell.swift; sourceTree = "<group>"; };
 		D1A7E0D724C6201F00A71E91 /* ListCurrenciesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCurrenciesModel.swift; sourceTree = "<group>"; };
+		D1C7B4A32E32D62D00AAB818 /* ConversionModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversionModule.swift; sourceTree = "<group>"; };
 		D1C92B6024C3B77D0049E64B /* CoinConversion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoinConversion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1C92B6324C3B77D0049E64B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D1C92B6524C3B77D0049E64B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -396,6 +398,7 @@
 		D1E2CE1624DD7CBA00D0F468 /* Router */ = {
 			isa = PBXGroup;
 			children = (
+				D1C7B4A32E32D62D00AAB818 /* ConversionModule.swift */,
 				D1D51C6924C3D7A700B8D165 /* ConversionRouter.swift */,
 			);
 			path = Router;
@@ -554,6 +557,7 @@
 				D1A1B12524C4E6A300C88F6F /* ListCurrenciesPresenter.swift in Sources */,
 				D1C92B9624C3C9550049E64B /* AppEnvironment.swift in Sources */,
 				D1D51C6A24C3D7A700B8D165 /* ConversionRouter.swift in Sources */,
+				D1C7B4A42E32D63000AAB818 /* ConversionModule.swift in Sources */,
 				D1C92B8924C3BCF60049E64B /* ServiceRequest.swift in Sources */,
 				D1C92B7F24C3BC5F0049E64B /* ServiceEncoding.swift in Sources */,
 				D1E9FF2F24C4D8B200FCAD32 /* UIView+Extension.swift in Sources */,

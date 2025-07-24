@@ -9,23 +9,14 @@
 import Foundation
 
 // MARK: - ConversionViewModel
-class ConversionViewModel: NSObject {
-    var date: Double?
-    var conversion: [ConversionCurrenciesViewModel]?
-    
-    init(date: Double, conversion: [ConversionCurrenciesViewModel]) {
-        self.date = date
-        self.conversion = conversion
-    }
+struct ConversionViewModel {
+    let date: Double
+    let currencies: [ConversionCurrencyViewModel]
 }
 
-// MARK: - ConversionCurrenciesViewModel
-class ConversionCurrenciesViewModel: NSObject {
-    var code: String?
-    var quotes: Double?
-    
-    init(code: String, quotes: Double) {
-        self.code = code
-        self.quotes = quotes
-    }
+// MARK: - ConversionCurrencyViewModel
+struct ConversionCurrencyViewModel {
+    let code: String
+    let quotes: Double
 }
+

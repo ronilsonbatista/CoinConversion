@@ -6,47 +6,39 @@
 //  Copyright © 2020 Ronilson Batista. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
-// MARK: - ConversionRouterDelegate
+// MARK: - Routing
+protocol ConversionRouting: AnyObject {
+    func navigateToListCurrencies(using conversion: Conversion)
+}
+
+// MARK: - Delegate
 protocol ConversionRouterDelegate: AnyObject {
     func currencyFetched(_ code: String, _ name: String, _ conversion: Conversion)
 }
 
 // MARK: - Main
-class ConversionRouter {
+final class ConversionRouter: ConversionRouting {
     
-    private let window: UIWindow
     weak var delegate: ConversionRouterDelegate?
     
-    init(window: UIWindow) {
-        self.window = window
-    }
-    
-    func createConversionScreen() {
-        let viewController = ConversionViewController(
-            presenter: ConversionPresenter(
-                interactor: CurrenciesConversionInteractor(),
-                dataManager: DataManager(),
-                router: self
-        ))
+    func setInitialScreen(in window: UIWindow) {
+        let interactor = CurrenciesConversionInteractor()
+        let dataManager = DataManager()
+        let presenter = ConversionPresenter(interactor: interactor, dataManager: dataManager, router: self)
+        let viewController = ConversionViewController(presenter: presenter)
         
-        let navigationController = UINavigationController(
-            rootViewController: viewController
-        )
+        let navigationController = UINavigationController(rootViewController: viewController)
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
     }
     
-    func enqueueListCurrencies(_ conversion: Conversion) {
-        let listCurrenciesViewController = ListCurrenciesModule.build(
-            conversion: conversion,
-            delegate: self
-        )
-
-        if let topViewController = UIApplication.shared.topMostViewController() {
-            topViewController.navigationController?.pushViewController(listCurrenciesViewController, animated: true)
+    func navigateToListCurrencies(using conversion: Conversion) {
+        let listVC = ListCurrenciesModule.build(conversion: conversion, delegate: self)
+        
+        if let topVC = UIApplication.shared.topMostViewController() {
+            topVC.navigationController?.pushViewController(listVC, animated: true)
         }
     }
 }

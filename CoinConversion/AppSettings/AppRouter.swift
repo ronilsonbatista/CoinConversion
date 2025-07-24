@@ -9,7 +9,7 @@
 import UIKit
 
 final class AppRouter {
-    
+
     private let window: UIWindow
     
     init(window: UIWindow) {
@@ -17,7 +17,6 @@ final class AppRouter {
     }
     
     func start() {
-        let router = ConversionRouter(window: window)
-        router.createConversionScreen()
+        ConversionModule.build(window: window, delegate: nil)
     }
 }
