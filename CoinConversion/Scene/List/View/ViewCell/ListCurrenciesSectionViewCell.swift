@@ -92,7 +92,7 @@ class ListCurrenciesSectionViewCell: UITableViewHeaderFooterView {
             sortByCodeButton.widthAnchor.constraint(equalToConstant: 86),
             sortByCodeButton.heightAnchor.constraint(equalTo: sortByNameButton.heightAnchor),
             
-            // alinhamento inferior (opcional, como no XIB)
+            // alinhamento inferior
             sortByNameButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16.5)
         ])
     }

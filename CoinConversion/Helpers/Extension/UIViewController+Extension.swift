@@ -89,9 +89,9 @@ extension UIViewController {
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.tintColor = tintColor
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "",
-                                                            style: .plain,
-                                                            target: nil,
-                                                            action: nil)
+                                                           style: .plain,
+                                                           target: nil,
+                                                           action: nil)
         navigationItem.title = title
         
         if isSearch, let searchController {

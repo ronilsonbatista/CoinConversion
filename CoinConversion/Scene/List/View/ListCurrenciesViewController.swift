@@ -223,4 +223,3 @@ extension ListCurrenciesViewController: ListCurrenciesPresenterDelegate {
         present(alert, animated: true, completion: nil)
     }
 }
-

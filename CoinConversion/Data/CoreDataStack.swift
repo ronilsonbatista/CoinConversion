@@ -14,7 +14,7 @@ final class CoreDataStack {
     
     private init() {}
     static let shared = CoreDataStack()
-        
+    
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CoinConversion")
         

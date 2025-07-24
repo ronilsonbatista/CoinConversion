@@ -10,12 +10,14 @@ import Foundation
 
 
 // MARK: - Interacting
+/// Contrato que define as ações que o Presenter pode solicitar ao Interactor.
 protocol ListCurrenciesInteracting {
     var delegate: ListCurrenciesInteractorDelegate? { get set }
     func fetchListCurrencies()
 }
 
 // MARK: - Delegate
+/// Delegate usado pelo Interactor para notificar o Presenter sobre os resultados da operação.
 protocol ListCurrenciesInteractorDelegate: AnyObject {
     func currenciesFetched(with listCurrencies: ListCurrencies)
     func handleFailure(with serviceError: ServiceError)

@@ -15,7 +15,7 @@ class EmptySearchViewCell: UITableViewCell {
     private let txtWithout: UILabel = {
         let label = UILabel()
         label.text = "Nenhuma moeda encontrada"
-        label.textColor = .gray // equivalente a scrollViewTexturedBackgroundColor
+        label.textColor = .gray
         label.font = .systemFont(ofSize: 16, weight: .semibold)
         label.textAlignment = .center
         label.numberOfLines = 0

@@ -37,42 +37,42 @@ final class ServiceManager: ServiceManagerProtocol {
         
         // Request
         AF.request(url,
-                          method: requestMethod,
-                          parameters: parameters,
-                          encoding: requestEncoding,
-                          headers: nil)
+                   method: requestMethod,
+                   parameters: parameters,
+                   encoding: requestEncoding,
+                   headers: nil)
+        
+        .validate(statusCode: 200..<300)
+        .validate(contentType: ["application/json"])
+        .responseJSON { response in
             
-            .validate(statusCode: 200..<300)
-            .validate(contentType: ["application/json"])
-            .responseJSON { response in
+            switch response.result {
                 
-                switch response.result {
-                    
-                case .success:
-                    guard let responseData = response.data else {
-                        failure(ServiceError(type: .notFound))
-                        return
-                    }
-                    
-                    success(responseData)
-                    
-                case .failure(let error):
-                    if error._code == NSURLErrorTimedOut {
-                        failure(ServiceError(type: .timeOut))
-                        return
-                    }
-                    
-                    switch response.response?.statusCode {
-                    case 403:
-                        failure(ServiceError(type: ServiceError.RequestError(code: 403)))
-                    case 401:
-                        failure(ServiceError(type: ServiceError.RequestError(code: 401)))
-                    case 400:
-                        break;
-                    default:
-                        failure(self.handleFailure(with: response))
-                    }
+            case .success:
+                guard let responseData = response.data else {
+                    failure(ServiceError(type: .notFound))
+                    return
                 }
+                
+                success(responseData)
+                
+            case .failure(let error):
+                if error._code == NSURLErrorTimedOut {
+                    failure(ServiceError(type: .timeOut))
+                    return
+                }
+                
+                switch response.response?.statusCode {
+                case 403:
+                    failure(ServiceError(type: ServiceError.RequestError(code: 403)))
+                case 401:
+                    failure(ServiceError(type: ServiceError.RequestError(code: 401)))
+                case 400:
+                    break;
+                default:
+                    failure(self.handleFailure(with: response))
+                }
+            }
         }
     }
     

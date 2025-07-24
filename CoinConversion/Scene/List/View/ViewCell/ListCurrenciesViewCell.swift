@@ -32,7 +32,7 @@ class ListCurrenciesViewCell: UITableViewCell {
     
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .colorBackground // no código original, o separador era custom
+        view.backgroundColor = .colorBackground
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()

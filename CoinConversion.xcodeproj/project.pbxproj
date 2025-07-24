@@ -184,10 +184,10 @@
 		D139A4E724C8DAC900006ABF /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				D1A4AED12E2D2A1A0075616D /* PersistenceError.swift */,
 				D139A4E824C8DAF300006ABF /* CoinConversion.xcdatamodeld */,
 				D139A4EB24C8DB0900006ABF /* CoreDataStack.swift */,
 				D139A4ED24C8DCA900006ABF /* DataManager.swift */,
+				D1A4AED12E2D2A1A0075616D /* PersistenceError.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -283,9 +283,9 @@
 			isa = PBXGroup;
 			children = (
 				D1C92B6324C3B77D0049E64B /* AppDelegate.swift */,
-				D1C92B6524C3B77D0049E64B /* SceneDelegate.swift */,
 				D1C92B9524C3C9550049E64B /* AppEnvironment.swift */,
 				D1D51C6B24C3D8E200B8D165 /* AppRouter.swift */,
+				D1C92B6524C3B77D0049E64B /* SceneDelegate.swift */,
 			);
 			path = AppSettings;
 			sourceTree = "<group>";
