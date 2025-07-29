@@ -49,7 +49,7 @@ extension UIColor {
         return UIColor(hexadecimal: 0x8B0000)
     }
     
-    static var colorSectionLabelk: UIColor {
+    static var colorSectionLabel: UIColor {
         return UIColor(hexadecimal: 0x424242)
     }
 }

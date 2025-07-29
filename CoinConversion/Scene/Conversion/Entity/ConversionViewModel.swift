@@ -20,3 +20,8 @@ struct ConversionCurrencyViewModel {
     let quotes: Double
 }
 
+// MARK: - Conversion
+enum Conversion {
+    case to
+    case from
+}
