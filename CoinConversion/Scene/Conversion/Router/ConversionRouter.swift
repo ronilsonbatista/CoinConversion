@@ -10,6 +10,7 @@ import UIKit
 
 // MARK: - Routing
 protocol ConversionRouting: AnyObject {
+    var delegate: ConversionRouterDelegate? { get set }
     func navigateToListCurrencies(using conversion: Conversion)
 }
 

@@ -6,158 +6,103 @@
 //  Copyright © 2020 Ronilson Batista. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
-// MARK: - Conversion
-enum Conversion {
-    case to
-    case from
+// MARK: - Presenting
+protocol ConversionPresenting {
+    var delegate: ConversionPresenterDelegate? { get set }
+    func formatCurrency(currencyCode: String, amount: String) -> String?
+    func fetchQuotes(isRefresh: Bool)
+    func fetchConvert(fromCode: String, toCode: String, value: String)
+    func fetchCurrencies(_ conversion: Conversion)
 }
 
-// MARK: - ConversionPresenterDelegate
+// MARK: - Delegate
 protocol ConversionPresenterDelegate: AnyObject {
     func didStartLoading()
     func didHideLoading()
     func didUpdateDate(with date: String)
     func didReloadData(code: String, name: String, conversion: Conversion)
     func didReloadResult(with value: String, color: UIColor)
-    func didFail(with title: String,
-                 message: String,
-                 buttonTitle: String,
-                 noConnection: Bool,
-                 dataSave: Bool
-    )
+    func didFail(with title: String, message: String, buttonTitle: String, noConnection: Bool, dataSave: Bool)
 }
 
 // MARK: - Main
-class ConversionPresenter {
+final class ConversionPresenter: ConversionPresenting {
+    
     weak var delegate: ConversionPresenterDelegate?
     
-    private var interactor: CurrenciesConversionInteractor?
-    private var router: ConversionRouter?
+    private var interactor: CurrenciesConversionInteracting
+    private let dataManager: DataManager
+    private let router: ConversionRouting
     private var conversionModel: ConversionViewModel?
-    private var dataManager: DataManager?
     
     init(
-        interactor: CurrenciesConversionInteractor,
+        interactor: CurrenciesConversionInteracting,
         dataManager: DataManager,
-        router: ConversionRouter
+        router: ConversionRouting
     ) {
         self.interactor = interactor
-        self.interactor?.delegate = self
         self.dataManager = dataManager
-        self.dataManager?.delegate = self
         self.router = router
-        self.router?.delegate = self
+        
+        self.interactor.delegate = self
+        self.dataManager.delegate = self
+        self.router.delegate = self
     }
-}
-
-// MARK: - Custom methods
-extension ConversionPresenter {
     
-    func fetchQuotes(isRefresh: Bool)  {
-        if !hasDatabaseQuotes() || isRefresh {
-            delegate?.didStartLoading()
-            interactor?.fetchQuotes()
-        }
+    func fetchQuotes(isRefresh: Bool) {
+        guard !hasDatabaseQuotes() || isRefresh else { return }
+        delegate?.didStartLoading()
+        interactor.fetchQuotes()
     }
     
     func fetchConvert(fromCode: String, toCode: String, value: String) {
-        let convert = convertCurrency(
-            fromCode: fromCode,
-            toCode: toCode,
-            value: value,
-            conversion: conversionModel?.currencies
-        )
-        guard convert == nil else {
-            delegate?.didReloadResult(
-                with: convert!,
-                color: .colorSpringGreen
-            )
-            return
+        guard let result = convertCurrency(fromCode: fromCode, toCode: toCode, value: value, conversion: conversionModel?.currencies) else {
+            return didConversionFail()
         }
-        didConversionFail()
+        delegate?.didReloadResult(with: result, color: .colorSpringGreen)
     }
     
     func fetchCurrencies(_ conversion: Conversion) {
-        router?.navigateToListCurrencies(using: conversion)
+        router.navigateToListCurrencies(using: conversion)
+    }
+    
+    func formatCurrency(currencyCode code: String, amount: String) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = Locale.availableIdentifiers
+            .map { Locale(identifier: $0) }
+            .first { ($0 as NSLocale).object(forKey: .currencyCode) as? String == code }
+        
+        let value = NSString(string: amount).doubleValue / 100
+        return formatter.string(from: NSNumber(value: value))
     }
 }
 
-// MARK: - Private Methods
-extension ConversionPresenter {
-    private func handleQuotes(with quotes: CurrenciesConversion) -> ConversionViewModel {
-        let currencies = quotes.quotes.map {
-            currencies -> ConversionCurrencyViewModel in
-            
-            return ConversionCurrencyViewModel(
-                code: currencies.key,
-                quotes: currencies.value
-            )
-        }
-        
-        return ConversionViewModel(date: quotes.timestamp, currencies: currencies)
-    }
-    
-    private func findLocaleBy(whit currencyCode: String) -> Locale? {
-        let locales = Locale.availableIdentifiers
-        var locale: Locale?
-        
-        for localeId in locales {
-            locale = Locale(identifier: localeId)
-            
-            if let code = (locale! as NSLocale).object(forKey: NSLocale.Key.currencyCode) as? String {
-                if code == currencyCode {
-                    return locale
-                }
-            }
-        }
-        
-        return locale
-    }
-    
-    private func convertCurrency(fromCode: String,toCode: String, value: String, conversion: [ConversionCurrencyViewModel]?) -> String? {
-        let currencyBase = "USD"
-        
-        guard let conversion = conversion else {
-            return nil
-        }
-        guard let fetchFromQuotes = returnQuotes(conversion: conversion, currencyBase: currencyBase, code: fromCode) else {
-            return nil
-        }
-        guard let fetchToQuotes = returnQuotes(conversion: conversion, currencyBase: currencyBase, code: toCode) else {
-            return nil
-        }
-
-        
-        if let value = Double(value) {
-            let calculate = calculateConversion(value: value, toQuotes: fetchToQuotes.quotes, fromQuotes: fetchFromQuotes.quotes)
-            
-            guard let result = formatCurrency(currencyCode: toCode, amount: String(calculate)) else {
-                return nil
-            }
-            return result
-        }
-        
-        if !value.isEmpty {
-            return nil
-        }
-        
-        return "-"
-    }
+// MARK: - Private
+private extension ConversionPresenter {
     
     private func hasDatabaseQuotes() -> Bool {
-        if dataManager?.hasDatabaseQuotes() ?? false {
-            conversionModel = dataManager?.fetchDatabaseQuotes()
-            guard let conversion = conversionModel else {
-                fatalError("provisorio fazer tratamento")
-            }
-            delegate?.didUpdateDate(
-                with: conversion.date.getDateStringFromUTC() 
-            )
-            return true
+        guard dataManager.hasDatabaseQuotes() else { return false }
+        guard let model = dataManager.fetchDatabaseQuotes() else { return false }
+        
+        conversionModel = model
+        delegate?.didUpdateDate(with: model.date.getDateStringFromUTC())
+        return true
+    }
+    
+    private func convertCurrency(fromCode: String, toCode: String, value: String, conversion: [ConversionCurrencyViewModel]?) -> String? {
+        guard
+            let value = Double(value),
+            let conversion = conversion,
+            let from = returnQuotes(conversion, base: "USD", code: fromCode),
+            let to = returnQuotes(conversion, base: "USD", code: toCode),
+            let result = formatCurrency(currencyCode: toCode, amount: String(value * to.quotes / from.quotes))
+        else {
+            return value.isEmpty ? "-" : nil
         }
-        return false
+        return result
     }
     
     private func didConversionFail() {
@@ -167,124 +112,96 @@ extension ConversionPresenter {
         )
     }
     
-    private func handleError(whit error: ServiceError) {
-        guard error.type == .noConnection else {
-            guard hasDatabaseQuotes() else {
-                delegate?.didFail(with: "Erro encontrado",
-                                  message: "Desculpe-nos pelo erro. Iremos contorná-lo o mais rápido possível. \nMotivo: \(error.type.description)",
+    private func handleQuotes(_ quotes: CurrenciesConversion) -> ConversionViewModel {
+        let currencies = quotes.quotes.map {
+            ConversionCurrencyViewModel(code: $0.key, quotes: $0.value)
+        }
+        return ConversionViewModel(date: quotes.timestamp, currencies: currencies)
+    }
+    
+    private func handleError(_ error: ServiceError) {
+        switch error.type {
+        case .noConnection:
+            if hasDatabaseQuotes() {
+                delegate?.didFail(
+                    with: "Problema na conexão",
+                    message: "Não conseguimos atualizar as cotas. Continue navegando com os dados da última atualização.",
+                    buttonTitle: "OK",
+                    noConnection: true,
+                    dataSave: true
+                )
+            } else {
+                delegate?.didFail(
+                    with: "Problema na conexão",
+                    message: "Encontramos problemas com a conexão. Tente ajustá-la para continuar navegando.",
+                    buttonTitle: "Tentar novamente",
+                    noConnection: true,
+                    dataSave: false
+                )
+            }
+        default:
+            if hasDatabaseQuotes() {
+                delegate?.didFail(
+                    with: "Erro encontrado",
+                    message: "Não conseguimos atualizar as cotas. Continue navegando com os dados da última atualização.",
                     buttonTitle: "OK",
                     noConnection: false,
                     dataSave: false
                 )
-                
-                return
+            } else {
+                delegate?.didFail(
+                    with: "Erro encontrado",
+                    message: "Desculpe-nos pelo erro. \nMotivo: \(error.type.description)",
+                    buttonTitle: "OK",
+                    noConnection: false,
+                    dataSave: false
+                )
             }
-            
-            delegate?.didFail(with: "Erro encontrado",
-                              message: "Desculpe-nos pelo erro. \nNão conseguimos atualizar as cotas continue navegando com os dados da última atualização.",
-                              buttonTitle: "OK",
-                              noConnection: false,
-                              dataSave: false
-            )
-            return
         }
-        
-        guard hasDatabaseQuotes() else {
-            delegate?.didFail(with: "Problema na conexão",
-                              message: "Encontramos problemas com a conexão. Tente ajustá-la para continuar navegando.",
-                              buttonTitle: "Tentar novamente",
-                              noConnection: true,
-                              dataSave: false
-            )
-            return
-        }
-        
-        delegate?.didFail(with: "Problema na conexão",
-                          message: "Encontramos problemas com a conexão. \nNão conseguimos atualizar as cotas continue navegando com os dados da última atualização.",
-                          buttonTitle: "OK",
-                          noConnection: true,
-                          dataSave: true
-        )
-        
+    }
+    
+    private func returnQuotes(_ conversion: [ConversionCurrencyViewModel], base: String, code: String) -> ConversionCurrencyViewModel? {
+        return conversion.first { $0.code == base + code }
     }
 }
 
-// MARK: - Aux Methods
-extension ConversionPresenter {
-    func formatCurrency( currencyCode: String, amount: String ) -> String? {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = findLocaleBy(whit: currencyCode)
-        
-        let numberFromField = (
-            NSString(string: amount).doubleValue
-            )/100
-        let result = formatter.string(
-            from: NSNumber(value: numberFromField)
-            )!
-        return result
-    }
-    
-    func returnQuotes(conversion: [ConversionCurrencyViewModel], currencyBase: String, code: String) -> ConversionCurrencyViewModel? {
-        if let quotes = conversion.first(
-            where: { $0.code == currencyBase + code }
-            ) {
-            return quotes
-        }
-        
-        return nil
-    }
-    
-    func calculateConversion(value: Double, toQuotes: Double, fromQuotes: Double) -> Double {
-        var result: Double = 0.0
-        result = value * toQuotes / fromQuotes
-        return result
-    }
-}
-
-// MARK: - CurrenciesConversionInteractorDelegate
+// MARK: - Interactor Delegate
 extension ConversionPresenter: CurrenciesConversionInteractorDelegate {
     func quotesFetched(with quotes: CurrenciesConversion) {
-        self.delegate?.didHideLoading()
+        delegate?.didHideLoading()
         
-        switch quotes.success {
-        case false:
-            handleError(whit: .init(type: .noAuthorized))
+        guard quotes.success else {
+            handleError(.init(type: .noAuthorized))
             return
-        default:
-            conversionModel = handleQuotes(
-                with: quotes
-            )
-            
-            self.delegate?.didUpdateDate(
-                with: conversionModel?.date.getDateStringFromUTC() ?? "-"
-            )
-            
-            dataManager?.syncQuotes(with: conversionModel!)
         }
+        
+        conversionModel = handleQuotes(quotes)
+        delegate?.didUpdateDate(with: conversionModel?.date.getDateStringFromUTC() ?? "-")
+        dataManager.syncQuotes(with: conversionModel!)
     }
     
     func handleFailure(with serviceError: ServiceError) {
         delegate?.didHideLoading()
-        handleError(whit: serviceError)
+        handleError(serviceError)
     }
 }
 
-// MARK: - ConversionRouterDelegate
+// MARK: - Router Delegate
 extension ConversionPresenter: ConversionRouterDelegate {
     func currencyFetched(_ code: String, _ name: String, _ conversion: Conversion) {
         delegate?.didReloadData(code: code, name: name, conversion: conversion)
     }
 }
 
-// MARK: - DataManagerDelegate
+// MARK: - Data Manager Delegate
 extension ConversionPresenter: DataManagerDelegate {
     func dataManager(didFailWith error: PersistenceError) {
-        delegate?.didFail(with: "Erro encontrado",
-                          message: "Desculpe-nos pelo erro. Não conseguimos salvar seus dados para uso off-line. \nMotivo: \(error)",
-                          buttonTitle: "Continuar Navegando",
-                          noConnection: false,
-                          dataSave: false)
+        delegate?.didFail(
+            with: "Erro encontrado",
+            message: "Não conseguimos salvar seus dados para uso off-line.\nMotivo: \(error)",
+            buttonTitle: "Continuar Navegando",
+            noConnection: false,
+            dataSave: false
+        )
     }
 }
-

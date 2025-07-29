@@ -30,7 +30,7 @@ class ListCurrenciesSectionViewCell: UITableViewHeaderFooterView {
     let sortByNameButton: RadioButton = {
         let button = RadioButton()
         button.setTitle("Nome", for: .normal)
-        button.setTitleColor(.colorSectionLabelk, for: .normal)
+        button.setTitleColor(.colorSectionLabel, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 18)
         button.iconColor = .colorGrayLighten60
         button.indicatorColor = .colorDarkishPink
@@ -43,7 +43,7 @@ class ListCurrenciesSectionViewCell: UITableViewHeaderFooterView {
     private let sortByCodeButton: RadioButton = {
         let button = RadioButton()
         button.setTitle("Código", for: .normal)
-        button.setTitleColor(.colorSectionLabelk, for: .normal)
+        button.setTitleColor(.colorSectionLabel, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 18)
         button.iconColor = .colorGrayLighten60
         button.indicatorColor = .colorDarkishPink

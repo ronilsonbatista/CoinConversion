@@ -10,91 +10,16 @@ import UIKit
 
 // MARK: - Main
 class ConversionViewController: UIViewController {
-    @IBOutlet private weak var scrollView: UIScrollView!
-    @IBOutlet private weak var updateDateLabel: UILabel!
-    @IBOutlet private weak var fromCurrencyNameLabel: UILabel!
-    @IBOutlet private weak var fromCurrencyCodeLabel: UILabel!
     
-    @IBOutlet private weak var valueTextField: UITextField! {
-        didSet {
-            valueTextField.delegate = self
-            valueTextField.tintColor = .colorDarkishPink
-            valueTextField.keyboardType = .numberPad
-        }
-    }
-    
-    @IBOutlet private weak var fromView: UIView! {
-        didSet {
-            fromView.setCardLayout()
-            fromViewTapGestureRecognizer(fromView)
-        }
-    }
-    
-    @IBOutlet private weak var fromWithCurrencyView: UIView! {
-        didSet {
-            fromWithCurrencyView.isHidden = true
-            fromWithCurrencyView.setCardLayout()
-            fromViewTapGestureRecognizer(fromWithCurrencyView)
-        }
-    }
-    
-    @IBOutlet private weak var fromSeparatorView: UIView! {
-        didSet {
-            fromSeparatorView.backgroundColor = .colorGrayLighten60
-        }
-    }
-    
-    @IBOutlet private weak var toCurrencyNameLabel: UILabel!
-    @IBOutlet private weak var toCurrencyCodeLabel: UILabel!
-    
-    @IBOutlet private weak var toView: UIView! {
-        didSet {
-            toView.setCardLayout()
-            toViewTapGestureRecognizer(toView)
-        }
-    }
-    
-    @IBOutlet private weak var toWithCurrencyView: UIView! {
-        didSet {
-            toWithCurrencyView.isHidden = true
-            toWithCurrencyView.setCardLayout()
-            toViewTapGestureRecognizer(toWithCurrencyView)
-        }
-    }
-    
-    @IBOutlet private weak var toSeparatorView: UIView! {
-        didSet {
-            toSeparatorView.backgroundColor = .colorGrayLighten60
-        }
-    }
-    
-    @IBOutlet private weak var conversionStackView: UIStackView! {
-        didSet {
-            conversionStackView.isHidden = true
-        }
-    }
-    
-    @IBOutlet private weak var valueView: UIView! {
-        didSet {
-            valueView.setCardLayout()
-        }
-    }
-    
-    @IBOutlet private weak var resultView: UIView! {
-        didSet {
-            resultView.setCardLayout()
-        }
-    }
-    
-    @IBOutlet private weak var resultLabel: UILabel!
-    
-    var presenter: ConversionPresenter?
-    
+    private let customView = ConversionView()
+    private var presenter: ConversionPresenting
     private var currentString = ""
     
-    init(presenter: ConversionPresenter) {
+    // MARK: - Init
+    init(presenter: ConversionPresenting) {
         self.presenter = presenter
-        super.init(nibName: ConversionViewController.nibName, bundle: nil)
+        super.init(nibName: nil, bundle: nil)
+        self.presenter.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -104,6 +29,10 @@ class ConversionViewController: UIViewController {
 
 // MARK: - UIViewController lifecycle
 extension ConversionViewController {
+    override func loadView() {
+        self.view = customView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .colorBackground
@@ -112,8 +41,11 @@ extension ConversionViewController {
         setupBarButton()
         addDoneButtonOnKeyboard()
         
-        presenter?.delegate = self
-        presenter?.fetchQuotes(isRefresh: false)
+        presenter.delegate = self
+        presenter.fetchQuotes(isRefresh: false)
+        
+        toViewTapGestureRecognizer(customView.toView)
+        fromViewTapGestureRecognizer(customView.fromView)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -164,11 +96,11 @@ extension ConversionViewController {
     }
     
     @objc private dynamic func refreshButtonTouched() {
-        presenter?.fetchQuotes(isRefresh: true)
+        presenter.fetchQuotes(isRefresh: true)
     }
     
     private func doLoading(action: UIAlertAction) {
-        presenter?.fetchQuotes(isRefresh: true)
+        presenter.fetchQuotes(isRefresh: true)
     }
     
     private func toViewTapGestureRecognizer(_ view: UIView) {
@@ -182,34 +114,34 @@ extension ConversionViewController {
     }
     
     @objc private dynamic func tapGestureRecognizedToView(sender: UITapGestureRecognizer) {
-        presenter?.fetchCurrencies(.to)
+        presenter.fetchCurrencies(.to)
     }
     
     @objc private dynamic func tapGestureRecognizedFromView(sender: UITapGestureRecognizer) {
-        presenter?.fetchCurrencies(.from)
+        presenter.fetchCurrencies(.from)
     }
     
-    @objc private func keyboardWillShow(notification:NSNotification){
+    @objc private func keyboardWillShow(notification:NSNotification) {
         guard let userInfo = notification.userInfo else {
             return
         }
         
         var keyboardFrame:CGRect = (
             userInfo[UIResponder.keyboardFrameBeginUserInfoKey] as! NSValue
-            ).cgRectValue
+        ).cgRectValue
         keyboardFrame = view.convert(keyboardFrame, from: nil)
         
-        var contentInset: UIEdgeInsets = scrollView.contentInset
+        var contentInset: UIEdgeInsets = customView.scrollView.contentInset
         contentInset.bottom = keyboardFrame.size.height
-        scrollView.contentInset = contentInset
+        customView.scrollView.contentInset = contentInset
     }
     
-    @objc private func keyboardWillHide(notification:NSNotification){
+    @objc private func keyboardWillHide(notification:NSNotification) {
         let contentInset: UIEdgeInsets = UIEdgeInsets.zero
-        scrollView.contentInset = contentInset
+        customView.scrollView.contentInset = contentInset
     }
     
-    private func addDoneButtonOnKeyboard(){
+    private func addDoneButtonOnKeyboard() {
         let doneToolbar: UIToolbar = UIToolbar(
             frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50)
         )
@@ -233,20 +165,20 @@ extension ConversionViewController {
         doneToolbar.items = items
         doneToolbar.sizeToFit()
         
-        valueTextField.inputAccessoryView = doneToolbar
+        customView.valueTextField.inputAccessoryView = doneToolbar
     }
     
-    @objc private func doneButtonAction(){
-        valueTextField.resignFirstResponder()
+    @objc private func doneButtonAction() {
+        customView.valueTextField.resignFirstResponder()
     }
 }
 // MARK: - UITextFieldDelegate
 extension ConversionViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let fromCode = fromCurrencyCodeLabel.text,
-            let toCode = toCurrencyCodeLabel.text  else {
-                return true
+        guard let fromCode = customView.fromCurrencyCodeLabel.text,
+              let toCode = customView.toCurrencyCodeLabel.text  else {
+            return true
         }
         
         if (textField.text!.count <= 30 && string == "") || (textField.text!.count < 30 && string != "") {
@@ -261,7 +193,7 @@ extension ConversionViewController: UITextFieldDelegate {
                 }
             }
         }
-        presenter?.fetchConvert(fromCode: fromCode, toCode: toCode, value: currentString)
+        presenter.fetchConvert(fromCode: fromCode, toCode: toCode, value: currentString)
         return false
     }
 }
@@ -270,7 +202,9 @@ extension ConversionViewController: UITextFieldDelegate {
 // MARK: - Format Currency
 extension ConversionViewController {
     private func formatCurrency(_ string: String, textField: UITextField, currencyCode: String) {
-        textField.text = presenter?.formatCurrency(currencyCode: currencyCode, amount: string)!
+        if let formatCurrency = presenter.formatCurrency(currencyCode: currencyCode, amount: string) {
+            textField.text = formatCurrency
+        }
     }
 }
 
@@ -287,33 +221,33 @@ extension ConversionViewController: ConversionPresenterDelegate {
     func didReloadData(code: String, name: String, conversion: Conversion) {
         switch conversion {
         case .from:
-            fromView.isHidden = true
-            fromWithCurrencyView.isHidden = false
-            fromCurrencyNameLabel.text = name
-            fromCurrencyCodeLabel.text = code
+            customView.fromView.isHidden = true
+            customView.fromWithCurrencyView.isHidden = false
+            customView.fromCurrencyNameLabel.text = name
+            customView.fromCurrencyCodeLabel.text = code
         case .to:
-            toView.isHidden = true
-            toWithCurrencyView.isHidden = false
-            toCurrencyCodeLabel.text = code
-            toCurrencyNameLabel.text = name
+            customView.toView.isHidden = true
+            customView.toWithCurrencyView.isHidden = false
+            customView.toCurrencyCodeLabel.text = code
+            customView.toCurrencyNameLabel.text = name
         }
         
-        if fromView.isHidden && toView.isHidden {
-            conversionStackView.isHidden = false
+        if customView.fromView.isHidden && customView.toView.isHidden {
+            customView.conversionStackView.isHidden = false
         }
-        resultLabel.text = "-"
-        resultView.setCardLayout()
-        valueTextField.text = ""
+        customView.resultLabel.text = "-"
+        customView.resultView.setCardLayout()
+        customView.valueTextField.text = ""
         currentString = ""
     }
     
     func didReloadResult(with value: String, color: UIColor) {
-        resultLabel.text = value
-        resultView.setCardLayout(color)
+        customView.resultLabel.text = value
+        customView.resultView.setCardLayout(color)
     }
     
     func didUpdateDate(with date: String) {
-        updateDateLabel.text = date
+        customView.updateDateLabel.text = date
     }
     
     func didFail(with title: String, message: String, buttonTitle: String, noConnection: Bool, dataSave: Bool) {
